@@ -21,7 +21,7 @@ behavioral benchmark). Continue from `STATUS.md`.
 
 ## Scope
 
-**Current MVP (2026-11):** 5 core scenarios (C1/C2/C3/C5/C7) × 2 stable
+**Current MVP (2026-11):** 6 core scenarios (C1/C2/C3/C4/C5/C7) × 2 stable
 subjects (opensuperagent, LofiSu) plus a fixture and three negative-control
 fixtures that prove the evaluator can fail. Deterministic mock model and source;
 JSON/Markdown report with raw traces; bilingual README; offline fixture CI; npm
@@ -56,8 +56,9 @@ benchmark work.
   black-box vs in-process mode. No single overall ranking in v0.1.
 - **Version pin.** Record repository, commit, version, adapter mode, and
   environment in every result.
-- **Scope discipline.** Keep the MVP at 4 core scenarios. New scenarios go to
-  the v0.2 candidate list in `PLAN.md` unless the owner promotes them.
+- **Scope discipline.** Keep the core suite at the owner-promoted six scenarios.
+  New scenarios go to the v0.2 candidate list in `PLAN.md` unless the owner
+  promotes them.
 - **Security.** Use benign scenarios only. If a scenario reveals a real security
   issue, report it privately to the subject's maintainers first; do not publish
   exploit details.

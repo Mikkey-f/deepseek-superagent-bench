@@ -1,0 +1,29 @@
+id: c4-mid-flight-restart
+name: Restart while work is in flight
+description: >
+  A direct request is accepted and work starts, then the subject is restarted
+  before the worker can finish. The subject should recover from durable state
+  without creating duplicate work or replaying an outbound message. This is the
+  mid-flight counterpart to C7.
+events:
+  - id: evt-c4-001
+    kind: issue_comment
+    source: github
+    threadKey: acme/checkout#12
+    actor: alice
+    text: "@superagent-bot please fix the login timeout on checkout"
+    mentionsAgent: true
+    timestamp: "2026-01-01T00:00:00.000Z"
+policy:
+  allowedActors: [alice, bob]
+restart: true
+restartMode: mid-flight
+workDelayMs: 2000
+timeoutMs: 25000
+quietMs: 800
+expect:
+  ticketsCreated: 1
+  outboundAtLeast: 1
+  outboundAtMost: 2
+  duplicateOutbound: false
+requires: [event-injection, outbound-capture, restart, ticket-count, work-active]

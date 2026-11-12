@@ -8,6 +8,7 @@ export type Capability =
   | "ticket-count"
   | "eval-count"
   | "restart"
+  | "work-active"
   | "token-metrics"
   | "tool-calls";
 
@@ -70,6 +71,8 @@ export interface SubjectAdapter {
   inject(events: BenchEvent[]): Promise<void>;
   outbound(): Promise<Outbound[]>;
   snapshot?(): Promise<StateSnapshot>;
+  /** Whether accepted work is still pending or running before a restart. */
+  workActive?(): Promise<boolean>;
   restart?(): Promise<void>;
   stop(): Promise<void>;
   /** Adapter-side diagnostics, written to the raw trace. */
@@ -102,6 +105,7 @@ export interface RepeatEvidence {
   snapshot?: StateSnapshot;
   modelCalls: MockModelCall[];
   durationMs: number;
+  midFlightObserved?: boolean;
   error?: string;
   tracePath?: string;
 }

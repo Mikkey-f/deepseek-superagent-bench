@@ -9,7 +9,7 @@
 它用合成事件驱动真实实现，覆盖直接请求、重复投递、越权发送者和重启恢复，然后报告
 “实际观测到了什么”以及“没能测试什么”。
 
-**状态：MVP（2026-11）。** 5 个核心场景、2 个真实被测实现、一个用于校验评测器本身的
+**状态：MVP（2026-11）。** 6 个核心场景、2 个真实被测实现、一个用于校验评测器本身的
 fixture，以及证明评测器能判负的负向对照。这是行为矩阵，不是排行榜。评测语义见
 [`docs/SPEC.md`](docs/SPEC.md)。
 
@@ -32,6 +32,7 @@ fixture，以及证明评测器能判负的负向对照。这是行为矩阵，�
 | C1 | `direct-request` | 允许的用户直接请求；产生出站消息且不重复。 |
 | C2 | `duplicate-delivery` | 同一个外部事件送达两次；工作和出站消息不重复。 |
 | C3 | `concurrent-duplicate-delivery` | 同一个事件并发送达两次；只产生 1 个工单且没有重复出站。 |
+| C4 | `mid-flight-restart` | 工作仍在进行时重启；恢复后不重复工作、不重放出站。 |
 | C5 | `unauthorized-sender` | 不在允许名单的发送者不触发工作、不产生回复、不创建工单。 |
 | C7 | `restart-recovery` | 请求被接收后重启；工作和出站消息不重复。不支持重启时报告 `not_tested`。 |
 
@@ -101,12 +102,14 @@ npm run bench -- run --suite core --subjects fixture,opensuperagent,lofisu --rep
 | C1 direct-request | pass 3/3 | pass 3/3 | pass 3/3 |
 | C2 duplicate-delivery | pass 3/3 | pass 3/3 | pass 3/3 |
 | C3 concurrent-duplicate-delivery | pass 3/3 | pass 3/3 | pass 3/3 |
+| C4 mid-flight-restart | pass 3/3 | pass 3/3 | pass 3/3 |
 | C5 unauthorized-sender | pass 3/3 | pass 3/3 | pass 3/3 |
 | C7 restart-recovery | pass 3/3 | pass 3/3 | pass 3/3 |
 
 C2 中三个实现都只产生 1 条出站消息和 1 个工单，工单数量是断言项；C3 在并发送达下
-得到相同结果；C5 都是 0 出站、0 工单，0 次模型调用是观测值；C7 重启后仍只有 1 个
-工单和 1 条出站消息，工单数量是断言项。完整逐项证据见本地生成的
+得到相同结果；C4 在重启前观测到活跃工作（`midFlightObserved: true`），重启后仍只有
+1 个工单和 1 条出站消息；C5 都是 0 出站、0 工单，0 次模型调用是观测值；C7 重启后
+仍只有 1 个工单和 1 条出站消息，工单数量是断言项。完整逐项证据见本地生成的
 `results/latest/report.md` 和 `results/latest/traces/`。
 
 ## 测什么，不测什么
@@ -159,22 +162,22 @@ interface SubjectAdapter {
 
 - **没有总冠军。** 结果是逐场景的；一个实现可以通过 C1 但失败 C2。
 - **合成输入。** mock 模型是脚本化的，事件源是本地构造的；真实模型可能表现不同。
-- **MVP 覆盖窄。** 只有 5 个场景；飞书、官方原型适配、真实投递重试不在 MVP 内。
+- **MVP 覆盖窄。** 只有 6 个场景；飞书、官方原型适配、真实投递重试不在 MVP 内。
 - **进程内抓取不等于真实投递。** 对进程内被测对象，出站可能来自持久化 outbox，
   包含尚未被真实渠道适配器投递的消息；报告会披露适配器模式。
 - **C2 允许两次确认。** 场景断言 1 个工单且没有重复出站，但被测实现可以为同一个
   工作单元发送两条内容不同的确认消息。
 - **C3 的并发在适配器边界。** 两次投递在 `adapter.inject()` 调用上重叠，但不模拟
   多进程、网络乱序或分区。
-- **重启时序。** C7 在当前 MVP 中是在首轮工作 settle 之后重启，验证的是持久状态和
-  非重放，不是进程中途硬崩溃恢复。
+- **重启时序。** C7 在首轮工作 settle 之后重启；C4 在工作活跃时重启，使用延迟
+  worker 和优雅 stop/start。两者都不模拟带有未落盘状态的硬崩溃。
 - **通过不等于生产可用。** 它只表示该次运行、该 commit 下，这些可观察断言成立。
 - **Flaky 是结果。** 多次重复不一致会标记为 `flaky`，不会被平均掉。
 
 ## 项目结构
 
 ```text
-scenarios/core/        C1/C2/C3/C5/C7 场景定义
+scenarios/core/        C1/C2/C3/C4/C5/C7 场景定义
 src/adapters/          fixture、opensuperagent、lofisu 适配器
 src/mock-model/        OpenAI-compatible 脚本化 mock 模型
 src/runner.ts          生命周期、settle、repeat 聚合、trace

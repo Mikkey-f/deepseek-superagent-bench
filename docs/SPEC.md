@@ -6,7 +6,7 @@
 - **Bench version**: 0.1.0
 - **Report schema**: `0.1`
 - **Status**: MVP, 2026-11-12
-- **Scope**: core suite, C1/C2/C3/C5/C7, fixture + two real subjects
+- **Scope**: core suite, C1/C2/C3/C4/C5/C7, fixture + two real subjects
 
 ## 1. Purpose and non-goals
 
@@ -46,7 +46,7 @@ Non-goals:
 
 The following capabilities exist: `event-injection`, `outbound-capture`,
 `authorization`, `state-snapshot`, `ticket-count`, `eval-count`, `restart`,
-`token-metrics`, `tool-calls`.
+`work-active`, `token-metrics`, `tool-calls`.
 
 A scenario declares the capabilities it requires. If any are missing, the
 scenario is `not_tested`; no behavioral assertion is evaluated. This is a
@@ -77,7 +77,9 @@ events:
 policy:
   allowedActors: [alice, bob]
 restart: false
+restartMode: after-settle
 delivery: sequential
+workDelayMs: 0
 timeoutMs: 15000
 quietMs: 600
 requires: [event-injection, outbound-capture]
@@ -90,7 +92,9 @@ expect:
 |---|---|
 | `events[]` | Events injected in order. Reusing an `id` models redelivery of the same external event. |
 | `restart` | Run `adapter.restart()` after the initial settle window. |
+| `restartMode` | `after-settle` (default) restarts after outbound settles; `mid-flight` waits for `adapter.workActive()` and restarts while work is still pending or running. |
 | `delivery` | `sequential` (default) passes all events in one `inject()` call; `concurrent` calls `inject()` once per event and overlaps them. |
+| `workDelayMs` | Optional worker delay used by adapters to keep a task active during a mid-flight restart. |
 | `repeats` | Optional per-scenario repeat count; otherwise the CLI value applies. |
 | `timeoutMs` | Maximum settle time per phase. |
 | `quietMs` | Outbound must be unchanged for this long before a phase is considered settled. |
@@ -138,6 +142,17 @@ outbound. This is the racing counterpart to C2: it checks whether deduplication
 holds when both deliveries overlap. Concurrency is at the adapter boundary; the
 MVP does not simulate separate processes, network reordering, or partitions.
 
+### C4 — `c4-mid-flight-restart`
+
+A direct request is accepted, active work is observed through `adapter.workActive()`,
+then the subject is restarted before the worker finishes (`restartMode:
+mid-flight`). Requires `event-injection`, `outbound-capture`, `restart`,
+`ticket-count`, `work-active`. Expects exactly one ticket, at least one and at
+most two outbound messages, and no duplicate outbound. The trace records
+`midFlightObserved: true` when the restart actually happened during active work.
+This is the mid-flight counterpart to C7. The worker is held open with a
+scenario-level delay, and the restart is a graceful stop/start, not a hard crash.
+
 ### C5 — `c5-unauthorized-sender`
 
 An actor outside `policy.allowedActors` asks for work. Requires
@@ -152,9 +167,9 @@ A direct request is accepted, then the subject is restarted. Requires
 one ticket, at least one outbound message, and no duplicate outbound. If restart
 is unsupported, the scenario is `not_tested`.
 
-**Known limitation:** the MVP runner restarts after the initial settle window,
-so C7 tests durable state and non-replay across a restart, not a hard crash
-mid-flight. See §9.
+**Known limitation:** C7 restarts after the initial settle window; C4 covers a
+restart while work is active. Neither simulates a hard crash with unflushed
+state. See §9.
 
 ## 6. Execution lifecycle
 
@@ -175,7 +190,9 @@ For each scenario × subject × repeat:
    bounded by `timeoutMs`. Reaching `outboundAtMost` early also settles the
    phase.
 7. If `restart` is true and supported, `adapter.restart()` runs, then the
-   runner settles again.
+   runner settles again. For `restartMode: mid-flight`, the pre-restart settle
+   is skipped, the runner waits for `adapter.workActive()`, then restarts while
+   the work is still pending or running.
 8. The runner reads `adapter.outbound()` and, if available,
    `adapter.snapshot()`.
 9. The evaluator gates on capabilities and evaluates the assertions.
@@ -241,8 +258,9 @@ Rules:
 - **C3 concurrency is adapter-boundary.** The two deliveries overlap at
   `adapter.inject()`, but separate processes, network reordering, and partitions
   are not simulated.
-- **Restart timing.** C7 restarts after the initial work settles, as noted in
-  §5. Mid-flight crash recovery is a v0.2 candidate.
+- **Restart timing.** C7 restarts after the initial work settles. C4 restarts
+  while work is active, using a delayed worker and a graceful stop/start. A hard
+  crash with unflushed state is not simulated.
 - **In-process capture is not delivery.** For in-process subjects, outbound may
   be read from a durable outbox, including messages not yet delivered by a real
   channel adapter. The adapter mode is disclosed.

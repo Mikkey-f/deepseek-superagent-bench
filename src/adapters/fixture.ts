@@ -19,6 +19,7 @@ interface FixtureState {
   seen: string[];
   tickets: FixtureTicket[];
   outbound: Outbound[];
+  pendingOutbound?: Pick<Outbound, "threadKey" | "body" | "createdAt">;
 }
 
 const STATE_FILE = "fixture-state.json";
@@ -44,6 +45,7 @@ export class FixtureAdapter implements SubjectAdapter {
     "ticket-count",
     "eval-count",
     "restart",
+    "work-active",
   ]);
 
   private state: FixtureState = emptyState();
@@ -51,11 +53,13 @@ export class FixtureAdapter implements SubjectAdapter {
   private allowedActors = new Set<string>();
   private ticketSeq = 0;
   private outboundSeq = 0;
+  private midFlight = false;
 
   async start(ctx: BenchContext): Promise<void> {
     await mkdir(ctx.workDir, { recursive: true });
     this.statePath = join(ctx.workDir, STATE_FILE);
     this.allowedActors = new Set(ctx.scenario.policy?.allowedActors ?? []);
+    this.midFlight = ctx.scenario.restartMode === "mid-flight";
     try {
       const raw = await readFile(this.statePath, "utf8");
       this.state = JSON.parse(raw) as FixtureState;
@@ -94,17 +98,25 @@ export class FixtureAdapter implements SubjectAdapter {
       }
 
       const body = `Acknowledged request on ${event.threadKey}: ${event.text}`;
-      const duplicate = this.state.outbound.some(
-        (message) => message.threadKey === event.threadKey && message.body === body,
-      );
-      if (!duplicate) {
-        this.outboundSeq += 1;
-        this.state.outbound.push({
-          id: `fixture-out-${this.outboundSeq}`,
+      if (this.midFlight) {
+        this.state.pendingOutbound ??= {
           threadKey: event.threadKey,
           body,
           createdAt: new Date().toISOString(),
-        });
+        };
+      } else {
+        const duplicate = this.state.outbound.some(
+          (message) => message.threadKey === event.threadKey && message.body === body,
+        );
+        if (!duplicate) {
+          this.outboundSeq += 1;
+          this.state.outbound.push({
+            id: `fixture-out-${this.outboundSeq}`,
+            threadKey: event.threadKey,
+            body,
+            createdAt: new Date().toISOString(),
+          });
+        }
       }
       await this.persist();
     }
@@ -124,6 +136,10 @@ export class FixtureAdapter implements SubjectAdapter {
     };
   }
 
+  async workActive(): Promise<boolean> {
+    return Boolean(this.state.pendingOutbound);
+  }
+
   async restart(): Promise<void> {
     try {
       const raw = await readFile(this.statePath, "utf8");
@@ -133,6 +149,16 @@ export class FixtureAdapter implements SubjectAdapter {
     }
     this.ticketSeq = this.state.tickets.length;
     this.outboundSeq = this.state.outbound.length;
+    if (this.state.pendingOutbound) {
+      const pending = this.state.pendingOutbound;
+      this.state.pendingOutbound = undefined;
+      this.outboundSeq += 1;
+      this.state.outbound.push({
+        id: `fixture-out-${this.outboundSeq}`,
+        ...pending,
+      });
+      await this.persist();
+    }
   }
 
   async stop(): Promise<void> {
