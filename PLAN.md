@@ -21,6 +21,10 @@
 > 4 个场景、JSON/Markdown 报告、中英 README、SPEC、CI workflow 已实现。本地
 > `npm run bench:core` 参考运行：fixture / opensuperagent / LofiSu × C1/C2/C5/C7，
 > 每个组合 3/3 通过。PR 合并与 CI 结果记录在 `STATUS.md`。
+>
+> **Post-MVP 进展（2026-11-12）**：PR #6 负向对照、PR #7 C3 并发重复投递、
+> PR #8 C4 mid-flight 重启已合并；核心套件为 6 个场景 × 2 个真实被测对象，
+> 本地矩阵 18/18 pass。发布 tag、公开结果和文章待做。
 
 ---
 
@@ -208,7 +212,7 @@ export interface SubjectAdapter {
 - [x] **P020** 版本钉住；临时 data root/端口；provider baseUrl 指向 mock 模型
 - [x] **P021** 签名 webhook 注入（`/hooks/webhook`）；重复投递支持
 - [x] **P022** 回调 URL 捕获出站；`/api/tasks` 快照（`/api/overview` 未使用）
-- [!] **P023** C5 `unauthorized-sender` 已完成；C3/C4 推迟到 v0.2
+- [!] **P023** C5 `unauthorized-sender` 已完成；C3/C4 已在 post-MVP 完成（PR #7/#8）
 - [x] **P024** 报告增加 subject 元数据与 adapter 模式
 - [x] **P025** 适配器说明写入 README / SPEC（独立故障排查文档暂缓）
 
@@ -219,7 +223,7 @@ export interface SubjectAdapter {
 - [x] **P030** 进程内适配：`Runtime.create({ home, model, ... })` + `ingest`
 - [x] **P031** 从 SQLite outbox/store 观测结果；scripted model 注入
 - [x] **P032** 重启模拟：销毁并重建 Runtime（同一 home），验证不重放/不重复
-- [!] **P033** C7 `restart-recovery` 已完成；C6 `concurrent-threads` 推迟到 v0.2
+- [!] **P033** C7 `restart-recovery` 已完成；C6 `concurrent-threads` 仍待做（v0.2）
 - [x] **P034** 跨实现报告 + adapter 模式/公平性说明
 - [x] **P035** 适配器说明写入 README / SPEC
 

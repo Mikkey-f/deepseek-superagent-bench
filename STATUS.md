@@ -1,12 +1,12 @@
 # DeepSeek SuperAgent Bench — STATUS
 
 > **Last updated**: 2026-11-12
-> **Current phase**: MVP shipped to `main` via PRs #1–#4; gate-fix PR #5 has
-> green CI and awaits owner acceptance/merge
-> **Current milestone**: public repo + core + 2 subjects × 4 scenarios + report
-> **Next action**: review/merge gate-fix PR #5, then run `npm run bench:fixture`
-> and inspect the report; then decide the post-MVP scope (C3/C4/C6, official
-> prototype adapter, or community feedback).
+> **Current phase**: MVP plus post-MVP P0/C3/C4 shipped to `main`; release
+> packaging and a final owner acceptance run remain
+> **Current milestone**: 6 core scenarios × 2 real subjects + fixture +
+> negative controls; 18/18 local matrix pass
+> **Next action**: run/refresh release acceptance evidence, publish pinned
+> results and a release tag, then resume `superagent-runtime/`
 > **Owner**: user; **implementation**: Claude Code
 > **Canonical plan**: [`PLAN.md`](PLAN.md) · **Spec**: [`docs/SPEC.md`](docs/SPEC.md)
 
@@ -22,19 +22,22 @@
   LofiSu (in-process Runtime); C1 direct-request, C2 duplicate-delivery,
   C5 unauthorized-sender, C7 restart-recovery; plus a fixture adapter that
   validates the evaluator itself.
+- **Post-MVP promotion**: owner approved P0 negative controls → C3 concurrent
+  duplicate delivery → C4 mid-flight restart on 2026-11-12. The core suite is
+  now six scenarios.
 - **Tooling**: npm (pnpm global install was declined); Node 22; TypeScript;
   Vitest; Biome.
-- **Paused**: `superagent-runtime/` is not part of this MVP; resume after the
-  bench ships.
+- **Paused**: `superagent-runtime/` is not part of this work; resume after the
+  bench release.
 
-## MVP definition of done
+## Definition of done
 
-- [x] Core, fixture, two real subject adapters, and four core scenarios exist.
+### MVP (shipped)
+
+- [x] Core, fixture, two real subject adapters, and four original core scenarios.
 - [x] `npm run bench:fixture` runs offline with no subject repositories.
 - [x] `npm run bench:core` runs offline (no API keys, no real GitHub/Feishu).
-- [x] Fixture passes all 4 scenarios, 3/3 repeats.
-- [x] Both opensuperagent and LofiSu pass all 4 scenarios, 3/3 repeats in the
-      local reference run.
+- [x] Fixture and both real subjects passed the original 4 scenarios, 3/3.
 - [x] JSON + Markdown report + raw traces; subject commit/version, adapter mode,
       capabilities, `measured`/`not_tested`, limitations, date.
 - [x] Capability gating: a missing required capability makes the whole scenario
@@ -42,12 +45,26 @@
 - [x] README (English + Chinese), `docs/SPEC.md`, CI workflow.
 - [x] Feature branch PR #1 and docs PRs #2–#4 merged with green CI; `main`
       branch protection enabled.
-- [ ] Gate-fix PR #5 merged; it adds `.gitattributes` and asserts ticket counts
-      for C2/C7.
-- [ ] Owner acceptance.
-- [x] No npm publish in the MVP (intentional).
+- [x] Gate-fix PR #5 merged: LF normalization, C2/C7 ticket assertions, dirty
+      subject warning.
+- [x] Owner authorized the post-MVP sequence on 2026-11-12; the release
+      acceptance run is still recommended before tagging.
 
-## Daily gates
+### Post-MVP (owner-promoted)
+
+- [x] P0 negative controls: three deliberately broken fixtures prove the
+      evaluator fails C2/C5/C7; `npm run bench:selftest` runs in CI. PR #6.
+- [x] C3 concurrent duplicate delivery: overlapping `inject()` calls still yield
+      one ticket and no duplicate outbound. PR #7.
+- [x] C4 mid-flight restart: restart while work is active; `midFlightObserved`
+      is recorded, and no duplicate work/outbound appears. PR #8.
+- [ ] C6 concurrent threads / thread isolation.
+- [ ] Delivery retry and approval/mandate scenarios (v0.2 candidates).
+- [ ] Pinned public results snapshot + GitHub Release + article.
+- [ ] Real-subject CI/nightly runs (CI currently exercises the fixture only).
+- [ ] Official prototype adapter (timeboxed, experimental).
+
+## Daily gates (MVP)
 
 | Day | Date | Deliverable | Gate | Status |
 |---|---|---|---|---|
@@ -55,23 +72,22 @@
 | D2 | 11-13 | opensuperagent adapter, C1/C2/C5/C7, report JSON/MD | one real subject end-to-end; report readable | done early |
 | D3 | 11-14 | LofiSu adapter, README, CI, first PR merge | CI green; owner can run one command | done early |
 
-D3 shipped on 11-12: LofiSu did not block, both subjects are integrated, PR #1
-merged with green CI, and `main` now requires the CI check and a PR.
-
 ## Evidence log
 
 Environment: Node v22.14.0, npm 10.9.2, git 2.49.0, gh 2.97.0 authenticated as
 `Mikkey-f`. Windows 11, Bash via Git Bash.
 
-### Checks
+### Checks (latest, 2026-11-12)
 
 | Command | Result |
 |---|---|
 | `npm run typecheck` | pass, no output |
-| `npm run lint` | pass, 21 files checked |
-| `npm test` | 4 files / 9 tests pass; fixture suite 4 scenarios × 3 repeats in ~11 s |
-| `npm run bench:fixture` | pass 4/4, 3/3 repeats |
-| `npm run bench:core` | pass 12/12 scenario×subject combinations, 3/3 repeats; C2/C7 now include the `tickets-created` check |
+| `npm run lint` | pass, 23 files checked on Windows |
+| `npm test` | 5 files / 12 tests pass; fixture suite 6 scenarios × 3 repeats; selftest included |
+| `npm run bench:selftest` | negative controls fail as intended; control cases pass |
+| `npm run bench:fixture` | pass 6/6, 3/3 repeats |
+| `npm run bench:core` | pass 18/18 scenario×subject combinations, 3/3 repeats |
+| `npm run build` | pass |
 
 ### Reference matrix (2026-11-12)
 
@@ -86,111 +102,111 @@ Pinned subjects:
 |---|---|---|---|
 | C1 direct-request | pass 3/3 | pass 3/3 | pass 3/3 |
 | C2 duplicate-delivery | pass 3/3 | pass 3/3 | pass 3/3 |
+| C3 concurrent-duplicate-delivery | pass 3/3 | pass 3/3 | pass 3/3 |
+| C4 mid-flight-restart | pass 3/3 | pass 3/3 | pass 3/3 |
 | C5 unauthorized-sender | pass 3/3 | pass 3/3 | pass 3/3 |
 | C7 restart-recovery | pass 3/3 | pass 3/3 | pass 3/3 |
 
 Observed values:
 
 - C1: 1 outbound, 1 ticket per repeat for every subject.
-- C2: duplicate delivery still yields 1 outbound and 1 ticket per repeat.
+- C2/C3: duplicate delivery still yields 1 outbound and 1 ticket per repeat.
+- C4: 1 ticket and 1 outbound per repeat; `midFlightObserved: true` on all
+  repeats. OpenSuperAgent logs `[recover] handled 1 incomplete runs` after the
+  restart.
 - C5: 0 tickets, 0 outbound, 0 model calls per repeat; `ticketsCreated: 0` is
   asserted in addition to the outbound/authorization checks.
 - C7: after restart, still 1 outbound and 1 ticket; no duplicate outbound.
 
 Artifacts (gitignored, local): `results/latest/report.md`,
-`results/latest/report.json`, `results/latest/traces/`, `results/final-run.log`.
+`results/latest/report.json`, `results/latest/traces/`,
+`results/post-mvp-core.log`, `results/selftest/`.
+
+### Negative controls
+
+- `fixture-double-work` — C2 creates two tickets; `tickets-created` must fail.
+- `fixture-replay-restart` — C7 replays an outbound; `no-duplicate-outbound`
+  must fail.
+- `fixture-unauthorized-work` — C5 acts for an unauthorized sender;
+  `tickets-created` and `unauthorized-work` must fail.
+
+These are evaluator tests, not subjects, and never appear in the reference
+matrix.
 
 ### Release evidence
 
-- MVP PR: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/1;
-  merge commit `df41bb07e1f05b31e07225efa008ef7716085720`.
-- Release-docs PR: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/2;
-  merge commit `a549b1b8f62eba45f278f8a5f1e2652abfbe4b62`.
-- Final evidence PR:
-  https://github.com/Mikkey-f/deepseek-superagent-bench/pull/3; merge commit
-  `d61bdc3`.
-- Release-evidence tip PR:
-  https://github.com/Mikkey-f/deepseek-superagent-bench/pull/4; merge commit
-  `d439ccc`.
-- Gate-fix PR: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/5;
-  green CI, merge pending.
-- CI jobs: PR #1 pass in 36 s, PR #2 pass in 34 s, PR #3 pass in 33 s, PR #4
-  pass in 36 s, PR #5 pass in 37 s; main push runs after each merge pass. All on
-  Node 22 (Ubuntu), job name `typecheck / lint / test / fixture`.
+- MVP PR #1: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/1
+- Docs PRs #2–#4: release evidence and CI badge.
+- Gate-fix PR #5: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/5
+- Negative controls PR #6: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/6
+- C3 PR #7: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/7
+- C4 PR #8: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/8
+- CI jobs: PR #5 37 s, PR #6 47 s, PR #7 54 s, PR #8 55 s; main push after each
+  merge passed (latest main run: 1 m 2 s). All on Node 22 (Ubuntu), job name
+  `typecheck / lint / test / fixture`.
 - Branch protection on `main`: PR required, required check
   `typecheck / lint / test / fixture` (strict/up-to-date), admins enforced, force
   pushes and branch deletion disabled.
-- PRs were merged with merge commits, not squashes. Merged feature branches were
-  deleted after merge. Use `git log` for the current `main` tip; this document
-  does not pin a moving branch head.
-- Post-merge verification: `npm run bench:fixture` passes 4/4 on `main`
+- Post-merge verification: `npm run bench:core` passed 18/18 on `main`
   (2026-11-12).
+- Use `git log` for the current `main` tip; this document does not pin a moving
+  branch head.
 
-### Fixes made during the MVP run
+### Fixes and review findings
 
 - OpensuperAgent mock script: removed a broad `report|result|completed` regex
-  that matched the router system prompt and prevented `start_task`; the router
-  turn now always receives `start_task`, and the worker turn receives
-  `_submit_result`.
-- Runner: each repeat now removes its work directory before starting. Reusing a
-  durable inbox made reruns vacuous because the synthetic event was deduped.
-- Fairness: capability gating now short-circuits the entire scenario to
-  `not_tested` when a required capability is missing, instead of failing
-  dependent assertions. Added `test/assertions.test.ts`.
-- C5: added `ticketsCreated: 0`, so “no work” is observable rather than inferred
-  only from outbound.
-
-### Gate review (2026-11-12)
-
-- Found a Windows-only failure: `npm run lint` failed on a clean checkout
-  because Git wrote CRLF and there was no `.gitattributes`; the Linux CI stayed
-  green. Added `* text=auto eol=lf` and normalized the working tree. Lint now
-  passes on Windows (`21 files checked`).
-- Closed a duplicate-work blind spot: C2 and C7 previously asserted only
-  outbound. Both now require `ticket-count` and assert exactly one ticket; a
-  subject that creates two tickets can no longer pass. Added unit coverage.
-- `prepare:subjects` now warns if a subject checkout has uncommitted changes, so
-  the recorded commit is not presented as the whole run.
-- Re-ran the full matrix on the tightened scenarios: 12/12 pass, 3/3 repeats;
-  C2/C7 each report `tickets-created: pass`. `npm test` is 9/9.
-- Gate-fix PR: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/5;
-  CI run 43190697885 passed in 37 s.
+  that matched the router system prompt and prevented `start_task`.
+- Runner: each repeat removes its work directory before starting, so durable
+  inboxes cannot turn a rerun into a vacuous pass.
+- Fairness: missing capabilities short-circuit the whole scenario to
+  `not_tested`; C2/C7 assert one ticket, not only outbound.
+- Windows lint: `.gitattributes` keeps text LF; the previous CRLF failure was
+  masked by Linux CI.
+- C4 timing: the pre-restart settle is skipped for mid-flight restarts; the
+  runner waits for `workActive()` before stopping the subject.
+- `prepare:subjects` warns when a subject checkout has uncommitted changes.
 
 ### Known caveats
 
-- C7 restarts after the initial settle window; it validates durable state and
-  non-replay, not mid-flight crash recovery.
+- C4 is a graceful stop/start with a delayed worker, not a hard process crash
+  with unflushed state.
+- C7 restarts after the initial settle window; C4 covers active-work restarts.
 - In-process LofiSu outbound is read from its durable outbox; that is not proof
   of real channel delivery. Adapter mode is disclosed in the report.
-- C2 permits two outbound acknowledgements for one ticket; it asserts one unit
-  of work, not exactly one message.
+- C2/C3 permit two outbound acknowledgements for one ticket; they assert one
+  unit of work.
 - Some opensuperagent dependencies declare Node ≥22.19. The reference run on
   Node 22.14 completed successfully, but real-subject runs should prefer a
-  Node 22.19+ toolchain. CI exercises only the fixture suite.
+  Node 22.19+ toolchain.
+- CI exercises only the offline fixture and negative controls; real-subject
+  matrices are local.
+- All 18 combinations currently pass. The suite proves conformance on these
+  scenarios, not production readiness or a ranking.
 - No real model, GitHub, Feishu, or external network was used.
 
 ## Blockers
 
 - None technical.
-- Remaining release step: owner acceptance.
+- Remaining release work: acceptance run, pinned public results, tag/article.
 
 ## Open decisions
 
 | Decision | Options | Recommendation | Status |
 |---|---|---|---|
-| Branch protection | required CI + PR | Require PR and the CI job after the first green run | Done |
-| npm package publish | publish vs defer | Defer; MVP is a GitHub open-source release | Decided: no publish |
-| Report publishing | repo Markdown vs Pages | Repo Markdown + generated artifacts for now | Provisional |
-| Post-MVP scope | C3/C4/C6 vs official prototype | Take community feedback; official prototype is high-risk | Later |
+| Branch protection | required CI + PR | Keep | Done |
+| npm package publish | publish vs defer | Defer; GitHub release first | Decided: no publish |
+| Report publishing | repo Markdown vs Pages | Publish a pinned result snapshot next | Provisional |
+| Next scenario | C6 vs delivery retry vs approval | C6 is cheap; delivery retry/approval need adapter work | Later |
+| Runtime resume | after release vs now | After bench release, return to `superagent-runtime/` | Paused |
 
 ## Next actions
 
-1. Review and merge PR #5; then run owner acceptance with
-   `npm run bench:fixture` or `npm run bench:core`, and inspect
-   `results/latest/report.md` and one trace.
-2. If accepted, tag the repository/release and decide the post-MVP scope; do not
-   add C3/C4/C6 or the official prototype without owner promotion.
-3. Only after the bench MVP ships, consider resuming `superagent-runtime/`.
+1. Run release acceptance: `npm run bench:core`, inspect
+   `results/latest/report.md` and one C4 trace.
+2. Publish pinned results and a GitHub Release; write the Chinese/English post.
+3. Optionally add C6 or a real-subject CI job if community feedback warrants it.
+4. Resume `superagent-runtime/`; do not expand the bench further without owner
+   promotion.
 
 ## Handoff protocol
 
