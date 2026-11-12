@@ -1,0 +1,60 @@
+{
+  "scenario": "c1-direct-request",
+  "subject": "fixture-replay-restart",
+  "repeat": 1,
+  "events": [
+    {
+      "id": "evt-c1-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "outbound": [
+    {
+      "id": "negative-out-1",
+      "threadKey": "acme/checkout#12",
+      "body": "negative ack for acme/checkout#12",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "metadata": {
+        "fault": "replay-restart"
+      }
+    }
+  ],
+  "snapshot": {
+    "tickets": 1,
+    "openTickets": 1,
+    "endedTickets": 0,
+    "outbound": 1
+  },
+  "modelCalls": [],
+  "adapterLogs": [
+    "negative fixture fault=replay-restart"
+  ],
+  "checks": [
+    {
+      "id": "outbound-at-least",
+      "label": "outbound messages at least",
+      "status": "pass",
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "id": "no-duplicate-outbound",
+      "label": "no duplicate outbound",
+      "status": "pass",
+      "expected": "no duplicate (threadKey, body) or id",
+      "actual": {
+        "duplicates": [],
+        "duplicateIds": 0
+      }
+    }
+  ],
+  "status": "pass",
+  "durationMs": 664,
+  "midFlightObserved": false
+}

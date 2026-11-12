@@ -1,0 +1,86 @@
+{
+  "scenario": "c2-duplicate-delivery",
+  "subject": "fixture-double-work",
+  "repeat": 1,
+  "events": [
+    {
+      "id": "evt-c2-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "evt-c2-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:05.000Z"
+    }
+  ],
+  "outbound": [
+    {
+      "id": "negative-out-1",
+      "threadKey": "acme/checkout#12",
+      "body": "negative ack 1",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "metadata": {
+        "fault": "double-work"
+      }
+    },
+    {
+      "id": "negative-out-2",
+      "threadKey": "acme/checkout#12",
+      "body": "negative ack 2",
+      "createdAt": "2026-01-01T00:00:05.000Z",
+      "metadata": {
+        "fault": "double-work"
+      }
+    }
+  ],
+  "snapshot": {
+    "tickets": 2,
+    "openTickets": 2,
+    "endedTickets": 0,
+    "outbound": 2
+  },
+  "modelCalls": [],
+  "adapterLogs": [
+    "negative fixture fault=double-work"
+  ],
+  "checks": [
+    {
+      "id": "outbound-at-most",
+      "label": "outbound messages at most",
+      "status": "pass",
+      "expected": 2,
+      "actual": 2
+    },
+    {
+      "id": "no-duplicate-outbound",
+      "label": "no duplicate outbound",
+      "status": "pass",
+      "expected": "no duplicate (threadKey, body) or id",
+      "actual": {
+        "duplicates": [],
+        "duplicateIds": 0
+      }
+    },
+    {
+      "id": "tickets-created",
+      "label": "tickets created",
+      "status": "fail",
+      "expected": 1,
+      "actual": 2
+    }
+  ],
+  "status": "fail",
+  "durationMs": 653,
+  "midFlightObserved": false
+}

@@ -1,0 +1,77 @@
+{
+  "scenario": "c2-duplicate-delivery",
+  "subject": "fixture-unauthorized-work",
+  "repeat": 1,
+  "events": [
+    {
+      "id": "evt-c2-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "evt-c2-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:05.000Z"
+    }
+  ],
+  "outbound": [
+    {
+      "id": "negative-out-1",
+      "threadKey": "acme/checkout#12",
+      "body": "negative ack for acme/checkout#12",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "metadata": {
+        "fault": "unauthorized-work"
+      }
+    }
+  ],
+  "snapshot": {
+    "tickets": 1,
+    "openTickets": 1,
+    "endedTickets": 0,
+    "outbound": 1
+  },
+  "modelCalls": [],
+  "adapterLogs": [
+    "negative fixture fault=unauthorized-work"
+  ],
+  "checks": [
+    {
+      "id": "outbound-at-most",
+      "label": "outbound messages at most",
+      "status": "pass",
+      "expected": 2,
+      "actual": 1
+    },
+    {
+      "id": "no-duplicate-outbound",
+      "label": "no duplicate outbound",
+      "status": "pass",
+      "expected": "no duplicate (threadKey, body) or id",
+      "actual": {
+        "duplicates": [],
+        "duplicateIds": 0
+      }
+    },
+    {
+      "id": "tickets-created",
+      "label": "tickets created",
+      "status": "pass",
+      "expected": 1,
+      "actual": 1
+    }
+  ],
+  "status": "pass",
+  "durationMs": 661,
+  "midFlightObserved": false
+}

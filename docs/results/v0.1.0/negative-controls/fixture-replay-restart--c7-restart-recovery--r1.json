@@ -1,0 +1,83 @@
+{
+  "scenario": "c7-restart-recovery",
+  "subject": "fixture-replay-restart",
+  "repeat": 1,
+  "events": [
+    {
+      "id": "evt-c7-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "outbound": [
+    {
+      "id": "negative-out-1",
+      "threadKey": "acme/checkout#12",
+      "body": "negative ack for acme/checkout#12",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "metadata": {
+        "fault": "replay-restart"
+      }
+    },
+    {
+      "id": "negative-replay-2",
+      "threadKey": "acme/checkout#12",
+      "body": "negative ack for acme/checkout#12",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "metadata": {
+        "fault": "replay-restart",
+        "replay": true
+      }
+    }
+  ],
+  "snapshot": {
+    "tickets": 1,
+    "openTickets": 1,
+    "endedTickets": 0,
+    "outbound": 2
+  },
+  "modelCalls": [],
+  "adapterLogs": [
+    "negative fixture fault=replay-restart"
+  ],
+  "checks": [
+    {
+      "id": "outbound-at-least",
+      "label": "outbound messages at least",
+      "status": "pass",
+      "expected": 1,
+      "actual": 2
+    },
+    {
+      "id": "no-duplicate-outbound",
+      "label": "no duplicate outbound",
+      "status": "fail",
+      "expected": "no duplicate (threadKey, body) or id",
+      "actual": {
+        "duplicates": [
+          {
+            "key": "acme/checkout#12\u0000negative ack for acme/checkout#12",
+            "count": 2
+          }
+        ],
+        "duplicateIds": 0
+      }
+    },
+    {
+      "id": "tickets-created",
+      "label": "tickets created",
+      "status": "pass",
+      "expected": 1,
+      "actual": 1
+    }
+  ],
+  "status": "fail",
+  "durationMs": 1759,
+  "restartMode": "after-settle",
+  "midFlightObserved": false
+}

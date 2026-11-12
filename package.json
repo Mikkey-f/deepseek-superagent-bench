@@ -20,6 +20,7 @@
     "format": "biome format --write .",
     "test": "vitest run",
     "bench:selftest": "vitest run test/selftest.test.ts",
+    "snapshot:results": "node scripts/snapshot-results.mjs",
     "test:watch": "vitest",
     "build": "tsc -p tsconfig.build.json",
     "prepare:subjects": "node scripts/prepare-subjects.mjs"

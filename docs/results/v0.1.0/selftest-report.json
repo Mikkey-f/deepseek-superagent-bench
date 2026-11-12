@@ -1,0 +1,1093 @@
+{
+  "schemaVersion": "0.1",
+  "generatedAt": "2026-11-12T10:32:37.009Z",
+  "benchVersion": "0.1.0",
+  "environment": {
+    "node": "v22.14.0",
+    "platform": "win32 x64",
+    "cwd": "<workspace>/deepseek-superagent-bench"
+  },
+  "suite": "core",
+  "repeats": 1,
+  "subjects": [
+    {
+      "id": "fixture-double-work",
+      "version": "1.0.0-negative",
+      "commit": "fixture-negative",
+      "mode": "fixture",
+      "capabilities": [
+        "authorization",
+        "event-injection",
+        "outbound-capture",
+        "restart",
+        "state-snapshot",
+        "ticket-count"
+      ]
+    },
+    {
+      "id": "fixture-replay-restart",
+      "version": "1.0.0-negative",
+      "commit": "fixture-negative",
+      "mode": "fixture",
+      "capabilities": [
+        "authorization",
+        "event-injection",
+        "outbound-capture",
+        "restart",
+        "state-snapshot",
+        "ticket-count"
+      ]
+    },
+    {
+      "id": "fixture-unauthorized-work",
+      "version": "1.0.0-negative",
+      "commit": "fixture-negative",
+      "mode": "fixture",
+      "capabilities": [
+        "authorization",
+        "event-injection",
+        "outbound-capture",
+        "restart",
+        "state-snapshot",
+        "ticket-count"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "scenarioId": "c1-direct-request",
+      "scenarioName": "Direct request from an allowed user",
+      "subjectId": "fixture-double-work",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-least",
+              "label": "outbound messages at least",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack 1",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "double-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 669,
+          "tracePath": "negative-controls/fixture-double-work--c1-direct-request--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c1-direct-request",
+      "scenarioName": "Direct request from an allowed user",
+      "subjectId": "fixture-replay-restart",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-least",
+              "label": "outbound messages at least",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "replay-restart"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 664,
+          "tracePath": "negative-controls/fixture-replay-restart--c1-direct-request--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c1-direct-request",
+      "scenarioName": "Direct request from an allowed user",
+      "subjectId": "fixture-unauthorized-work",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-least",
+              "label": "outbound messages at least",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "unauthorized-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 649,
+          "tracePath": "negative-controls/fixture-unauthorized-work--c1-direct-request--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c2-duplicate-delivery",
+      "scenarioName": "Duplicate delivery of the same trigger",
+      "subjectId": "fixture-double-work",
+      "status": "fail",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "fail",
+          "checks": [
+            {
+              "id": "outbound-at-most",
+              "label": "outbound messages at most",
+              "status": "pass",
+              "expected": 2,
+              "actual": 2
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "fail",
+              "expected": 1,
+              "actual": 2
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack 1",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "double-work"
+              }
+            },
+            {
+              "id": "negative-out-2",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack 2",
+              "createdAt": "2026-01-01T00:00:05.000Z",
+              "metadata": {
+                "fault": "double-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 2,
+            "openTickets": 2,
+            "endedTickets": 0,
+            "outbound": 2
+          },
+          "modelCalls": [],
+          "durationMs": 653,
+          "tracePath": "negative-controls/fixture-double-work--c2-duplicate-delivery--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c2-duplicate-delivery",
+      "scenarioName": "Duplicate delivery of the same trigger",
+      "subjectId": "fixture-replay-restart",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-most",
+              "label": "outbound messages at most",
+              "status": "pass",
+              "expected": 2,
+              "actual": 1
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "replay-restart"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 657,
+          "tracePath": "negative-controls/fixture-replay-restart--c2-duplicate-delivery--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c2-duplicate-delivery",
+      "scenarioName": "Duplicate delivery of the same trigger",
+      "subjectId": "fixture-unauthorized-work",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-most",
+              "label": "outbound messages at most",
+              "status": "pass",
+              "expected": 2,
+              "actual": 1
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "unauthorized-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 661,
+          "tracePath": "negative-controls/fixture-unauthorized-work--c2-duplicate-delivery--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c3-concurrent-duplicate-delivery",
+      "scenarioName": "Concurrent duplicate delivery of the same trigger",
+      "subjectId": "fixture-double-work",
+      "status": "fail",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "fail",
+          "checks": [
+            {
+              "id": "outbound-at-least",
+              "label": "outbound messages at least",
+              "status": "pass",
+              "expected": 1,
+              "actual": 2
+            },
+            {
+              "id": "outbound-at-most",
+              "label": "outbound messages at most",
+              "status": "pass",
+              "expected": 2,
+              "actual": 2
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "fail",
+              "expected": 1,
+              "actual": 2
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack 1",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "double-work"
+              }
+            },
+            {
+              "id": "negative-out-2",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack 2",
+              "createdAt": "2026-01-01T00:00:05.000Z",
+              "metadata": {
+                "fault": "double-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 2,
+            "openTickets": 2,
+            "endedTickets": 0,
+            "outbound": 2
+          },
+          "modelCalls": [],
+          "durationMs": 880,
+          "tracePath": "negative-controls/fixture-double-work--c3-concurrent-duplicate-delivery--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c3-concurrent-duplicate-delivery",
+      "scenarioName": "Concurrent duplicate delivery of the same trigger",
+      "subjectId": "fixture-replay-restart",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-least",
+              "label": "outbound messages at least",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            },
+            {
+              "id": "outbound-at-most",
+              "label": "outbound messages at most",
+              "status": "pass",
+              "expected": 2,
+              "actual": 1
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "replay-restart"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 876,
+          "tracePath": "negative-controls/fixture-replay-restart--c3-concurrent-duplicate-delivery--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c3-concurrent-duplicate-delivery",
+      "scenarioName": "Concurrent duplicate delivery of the same trigger",
+      "subjectId": "fixture-unauthorized-work",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-least",
+              "label": "outbound messages at least",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            },
+            {
+              "id": "outbound-at-most",
+              "label": "outbound messages at most",
+              "status": "pass",
+              "expected": 2,
+              "actual": 1
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "unauthorized-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 885,
+          "tracePath": "negative-controls/fixture-unauthorized-work--c3-concurrent-duplicate-delivery--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c4-mid-flight-restart",
+      "scenarioName": "Restart while work is in flight",
+      "subjectId": "fixture-double-work",
+      "status": "not_tested",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "not_tested",
+          "checks": [
+            {
+              "id": "capability:work-active",
+              "label": "capability work-active",
+              "status": "not_tested",
+              "expected": true,
+              "actual": false,
+              "detail": "fixture-double-work does not declare this capability"
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack 1",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "double-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 9,
+          "tracePath": "negative-controls/fixture-double-work--c4-mid-flight-restart--r1.json"
+        }
+      ],
+      "notes": [
+        "fixture-double-work does not declare this capability"
+      ]
+    },
+    {
+      "scenarioId": "c4-mid-flight-restart",
+      "scenarioName": "Restart while work is in flight",
+      "subjectId": "fixture-replay-restart",
+      "status": "not_tested",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "not_tested",
+          "checks": [
+            {
+              "id": "capability:work-active",
+              "label": "capability work-active",
+              "status": "not_tested",
+              "expected": true,
+              "actual": false,
+              "detail": "fixture-replay-restart does not declare this capability"
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "replay-restart"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 7,
+          "tracePath": "negative-controls/fixture-replay-restart--c4-mid-flight-restart--r1.json"
+        }
+      ],
+      "notes": [
+        "fixture-replay-restart does not declare this capability"
+      ]
+    },
+    {
+      "scenarioId": "c4-mid-flight-restart",
+      "scenarioName": "Restart while work is in flight",
+      "subjectId": "fixture-unauthorized-work",
+      "status": "not_tested",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "not_tested",
+          "checks": [
+            {
+              "id": "capability:work-active",
+              "label": "capability work-active",
+              "status": "not_tested",
+              "expected": true,
+              "actual": false,
+              "detail": "fixture-unauthorized-work does not declare this capability"
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "unauthorized-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 7,
+          "tracePath": "negative-controls/fixture-unauthorized-work--c4-mid-flight-restart--r1.json"
+        }
+      ],
+      "notes": [
+        "fixture-unauthorized-work does not declare this capability"
+      ]
+    },
+    {
+      "scenarioId": "c5-unauthorized-sender",
+      "scenarioName": "Request from an unauthorized sender",
+      "subjectId": "fixture-double-work",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-most",
+              "label": "outbound messages at most",
+              "status": "pass",
+              "expected": 0,
+              "actual": 0
+            },
+            {
+              "id": "unauthorized-work",
+              "label": "no outbound on unauthorized thread",
+              "status": "pass",
+              "expected": 0,
+              "actual": 0
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "pass",
+              "expected": 0,
+              "actual": 0
+            }
+          ],
+          "outbound": [],
+          "snapshot": {
+            "tickets": 0,
+            "openTickets": 0,
+            "endedTickets": 0,
+            "outbound": 0
+          },
+          "modelCalls": [],
+          "durationMs": 665,
+          "tracePath": "negative-controls/fixture-double-work--c5-unauthorized-sender--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c5-unauthorized-sender",
+      "scenarioName": "Request from an unauthorized sender",
+      "subjectId": "fixture-replay-restart",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-most",
+              "label": "outbound messages at most",
+              "status": "pass",
+              "expected": 0,
+              "actual": 0
+            },
+            {
+              "id": "unauthorized-work",
+              "label": "no outbound on unauthorized thread",
+              "status": "pass",
+              "expected": 0,
+              "actual": 0
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "pass",
+              "expected": 0,
+              "actual": 0
+            }
+          ],
+          "outbound": [],
+          "snapshot": {
+            "tickets": 0,
+            "openTickets": 0,
+            "endedTickets": 0,
+            "outbound": 0
+          },
+          "modelCalls": [],
+          "durationMs": 655,
+          "tracePath": "negative-controls/fixture-replay-restart--c5-unauthorized-sender--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c5-unauthorized-sender",
+      "scenarioName": "Request from an unauthorized sender",
+      "subjectId": "fixture-unauthorized-work",
+      "status": "fail",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "fail",
+          "checks": [
+            {
+              "id": "outbound-at-most",
+              "label": "outbound messages at most",
+              "status": "fail",
+              "expected": 0,
+              "actual": 1
+            },
+            {
+              "id": "unauthorized-work",
+              "label": "no outbound on unauthorized thread",
+              "status": "fail",
+              "expected": 0,
+              "actual": 1,
+              "detail": "negative-out-1"
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "fail",
+              "expected": 0,
+              "actual": 1
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#99",
+              "body": "negative ack for acme/checkout#99",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "unauthorized-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 8,
+          "tracePath": "negative-controls/fixture-unauthorized-work--c5-unauthorized-sender--r1.json"
+        }
+      ],
+      "notes": [
+        "negative-out-1"
+      ]
+    },
+    {
+      "scenarioId": "c7-restart-recovery",
+      "scenarioName": "Restart after a direct request",
+      "subjectId": "fixture-double-work",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-least",
+              "label": "outbound messages at least",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack 1",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "double-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 1755,
+          "tracePath": "negative-controls/fixture-double-work--c7-restart-recovery--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c7-restart-recovery",
+      "scenarioName": "Restart after a direct request",
+      "subjectId": "fixture-replay-restart",
+      "status": "fail",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "fail",
+          "checks": [
+            {
+              "id": "outbound-at-least",
+              "label": "outbound messages at least",
+              "status": "pass",
+              "expected": 1,
+              "actual": 2
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "fail",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [
+                  {
+                    "key": "acme/checkout#12\u0000negative ack for acme/checkout#12",
+                    "count": 2
+                  }
+                ],
+                "duplicateIds": 0
+              }
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "replay-restart"
+              }
+            },
+            {
+              "id": "negative-replay-2",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "replay-restart",
+                "replay": true
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 2
+          },
+          "modelCalls": [],
+          "durationMs": 1759,
+          "tracePath": "negative-controls/fixture-replay-restart--c7-restart-recovery--r1.json"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "scenarioId": "c7-restart-recovery",
+      "scenarioName": "Restart after a direct request",
+      "subjectId": "fixture-unauthorized-work",
+      "status": "pass",
+      "repeats": [
+        {
+          "repeat": 1,
+          "status": "pass",
+          "checks": [
+            {
+              "id": "outbound-at-least",
+              "label": "outbound messages at least",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            },
+            {
+              "id": "no-duplicate-outbound",
+              "label": "no duplicate outbound",
+              "status": "pass",
+              "expected": "no duplicate (threadKey, body) or id",
+              "actual": {
+                "duplicates": [],
+                "duplicateIds": 0
+              }
+            },
+            {
+              "id": "tickets-created",
+              "label": "tickets created",
+              "status": "pass",
+              "expected": 1,
+              "actual": 1
+            }
+          ],
+          "outbound": [
+            {
+              "id": "negative-out-1",
+              "threadKey": "acme/checkout#12",
+              "body": "negative ack for acme/checkout#12",
+              "createdAt": "2026-01-01T00:00:00.000Z",
+              "metadata": {
+                "fault": "unauthorized-work"
+              }
+            }
+          ],
+          "snapshot": {
+            "tickets": 1,
+            "openTickets": 1,
+            "endedTickets": 0,
+            "outbound": 1
+          },
+          "modelCalls": [],
+          "durationMs": 1745,
+          "tracePath": "negative-controls/fixture-unauthorized-work--c7-restart-recovery--r1.json"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "limitations": [
+    "MVP uses a scripted mock model and a synthetic event source; it does not measure real model quality.",
+    "Only the core suite is exercised; unlisted behaviors are not tested.",
+    "Real subjects are driven through their public or local interfaces; internal behavior is not asserted.",
+    "A pass means the scenario's observable assertions held for this run; it is not a production-readiness claim.",
+    "Results are version/commit/date pinned; rerun to reproduce.",
+    "Unofficial, not affiliated with DeepSeek."
+  ]
+}
