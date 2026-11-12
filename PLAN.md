@@ -246,7 +246,7 @@ export interface SubjectAdapter {
 - [ ] **P053** npm 包（P0）+ Docker 镜像（P1）
 - [ ] **P054** 90 秒演示视频/GIF：一条命令跑出矩阵 + 一个失败场景
 - [x] **P055** 首篇中文文章 + 英文 post（`docs/articles/2026-11-12-*`）
-- [ ] **P056** GitHub Release v0.1.0
+- [x] **P056** GitHub Release v0.1.0（tag `v0.1.0`）
 - [ ] **P057** `FAIRNESS.md`：公平性、被测方回应窗口、负责任披露、署名
 
 **验收**：干净机器一条命令跑通；发布完成；报告与复现命令可访问。
