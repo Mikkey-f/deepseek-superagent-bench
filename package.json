@@ -10,7 +10,7 @@
   "bin": {
     "superagent-bench": "dist/cli.js"
   },
-  "files": ["dist", "scenarios", "schemas", "README.md", "README.zh-CN.md", "LICENSE"],
+  "files": ["dist", "scenarios", "README.md", "README.zh-CN.md", "LICENSE"],
   "scripts": {
     "bench": "tsx src/cli.ts",
     "bench:core": "tsx src/cli.ts run --suite core --subjects fixture,opensuperagent,lofisu --repeats 3",

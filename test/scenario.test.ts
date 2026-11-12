@@ -12,6 +12,15 @@ describe("scenario loading", () => {
     ]);
   });
 
+  it("asserts ticket counts for duplicate delivery and restart recovery", async () => {
+    const scenarios = await loadSuite(process.cwd(), "core");
+    for (const id of ["c2-duplicate-delivery", "c7-restart-recovery"]) {
+      const scenario = scenarios.find((candidate) => candidate.id === id);
+      expect(scenario?.expect.ticketsCreated).toBe(1);
+      expect(scenario?.requires).toContain("ticket-count");
+    }
+  });
+
   it("rejects a scenario without events", () => {
     expect(() =>
       validateScenario({

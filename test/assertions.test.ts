@@ -64,6 +64,41 @@ describe("capability gating", () => {
     expect(result.checks.map((check) => check.status)).toEqual(["pass", "pass"]);
   });
 
+  it("fails when duplicate delivery creates two tickets even if outbound is unique", () => {
+    const duplicateDelivery = validateScenario({
+      id: "c2-test",
+      name: "Duplicate delivery",
+      description: "A test scenario.",
+      events: [
+        {
+          id: "evt-1",
+          threadKey: "thread-1",
+          actor: "alice",
+          text: "please help",
+        },
+      ],
+      requires: ["event-injection", "outbound-capture", "ticket-count"],
+      expect: { ticketsCreated: 1, outboundAtMost: 2, duplicateOutbound: false },
+    });
+
+    const result = evaluateScenario({
+      adapter: stubAdapter(["event-injection", "outbound-capture", "ticket-count"]),
+      scenario: duplicateDelivery,
+      outbound: [
+        { id: "out-1", threadKey: "thread-1", body: "ack one" },
+        { id: "out-2", threadKey: "thread-1", body: "ack two" },
+      ],
+      snapshot: { tickets: 2 },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((check) => check.id === "tickets-created")).toMatchObject({
+      status: "fail",
+      expected: 1,
+      actual: 2,
+    });
+  });
+
   it("gates a restart scenario when the adapter has no restart hook", () => {
     const restartScenario = validateScenario({
       id: "c7-test",
