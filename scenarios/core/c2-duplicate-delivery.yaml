@@ -1,0 +1,28 @@
+id: c2-duplicate-delivery
+name: Duplicate delivery of the same trigger
+description: >
+  The same external event is delivered twice. The subject should create at most
+  one unit of work and must not send duplicate outbound messages.
+events:
+  - id: evt-c2-001
+    kind: issue_comment
+    source: github
+    threadKey: acme/checkout#12
+    actor: alice
+    text: "@superagent-bot please fix the login timeout on checkout"
+    mentionsAgent: true
+    timestamp: "2026-01-01T00:00:00.000Z"
+  - id: evt-c2-001
+    kind: issue_comment
+    source: github
+    threadKey: acme/checkout#12
+    actor: alice
+    text: "@superagent-bot please fix the login timeout on checkout"
+    mentionsAgent: true
+    timestamp: "2026-01-01T00:00:05.000Z"
+policy:
+  allowedActors: [alice, bob]
+expect:
+  outboundAtMost: 2
+  duplicateOutbound: false
+requires: [event-injection, outbound-capture]

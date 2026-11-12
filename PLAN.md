@@ -16,10 +16,28 @@
 > C2 重复投递、C5 未授权、C7 重启恢复）+ fixture；端到端 report、CI、PR 工作流。
 > 5 周计划保留为 MVP 之后的 roadmap；官方原型适配器、HTML 报告、Docker 镜像、
 > 90 秒视频推迟到 v0.2。MVP 的验收标准和每日门禁见 [`STATUS.md`](STATUS.md)。
+>
+> **MVP 执行状态（2026-11-12）**：工具链、runner、mock 模型、fixture、两个适配器、
+> 4 个场景、JSON/Markdown 报告、中英 README、SPEC、CI workflow 已实现。本地
+> `npm run bench:core` 参考运行：fixture / opensuperagent / LofiSu × C1/C2/C5/C7，
+> 每个组合 3/3 通过。PR 合并与 CI 结果记录在 `STATUS.md`。
 
 ---
 
 ## 0. 完成定义（Definition of Done）
+
+### 0.1 MVP（当前发布目标）
+
+- [x] 2 个真实被测对象 × 4 个核心场景，外加 fixture 校验器。
+- [x] `npm run bench:fixture` 在无被测仓库、无 API key 的环境下可运行。
+- [x] JSON + Markdown 报告 + 原始 trace；含版本/commit、adapter 模式、能力、局限。
+- [x] 能力门控：缺少能力时整个场景 `not_tested`，不判负（有单元测试）。
+- [x] 中英 README、`docs/SPEC.md`、GitHub Actions workflow。
+- [x] 本地 3 次重复矩阵无 flaky/fail/error。
+- [ ] feature branch 的 PR 在 CI 全绿后合并；分支保护启用。
+- [ ] owner 验收。
+
+### 0.2 Post-MVP v0.1（MVP 验收后）
 
 v0.1.0 只有同时满足以下条件才算完成：
 
@@ -161,48 +179,48 @@ export interface SubjectAdapter {
 
 ### M0 项目基础（Week 1，约 3 人日）
 
-- [ ] **P001** 新建仓库 `superagent-bench`，MIT LICENSE、`.gitignore`、README 骨架（中英）
-- [ ] **P002** TypeScript + Node 22 + pnpm + tsx + Vitest + ESLint/Biome；`typecheck/test/build`
-- [ ] **P003** GitHub Actions：Linux 上 typecheck/test/build；Windows 本地 smoke 脚本
-- [ ] **P004** `docs/SPEC.md` + `schemas/scenario.schema.json`：事件、断言、limits、capability gating
-- [ ] **P005** `docs/REFERENCES.md`：资料、依赖、需要用户提供的内容
-- [ ] **P006** `src/types.ts`：`BenchEvent`、`Outbound`、`SubjectAdapter`、`Capability`
-- [ ] **P007** trace 与 result JSON 模型：版本、subject、scenario、metrics、status、notes
+- [x] **P001** 新建仓库 `deepseek-superagent-bench`，MIT LICENSE、`.gitignore`、中英 README
+- [x] **P002** TypeScript + Node 22 + npm + tsx + Vitest + Biome；`typecheck/lint/test/build`
+- [!] **P003** GitHub Actions：Linux 上 typecheck/lint/test/build/fixture；workflow 已加，首次 PR CI 待验证
+- [x] **P004** `docs/SPEC.md` + Zod 场景 schema（MVP 未单独生成 JSON Schema 文件）
+- [x] **P005** `docs/REFERENCES.md`：资料、依赖、需要用户提供的内容
+- [x] **P006** `src/types.ts`：`BenchEvent`、`Outbound`、`SubjectAdapter`、`Capability`
+- [x] **P007** trace 与 result JSON 模型：版本、subject、scenario、checks、status、notes
 
 **验收**：`pnpm typecheck && pnpm test` 绿；SPEC 可被 Zod 校验；接口评审通过。
 
 ### M1 Mock 环境 + Runner（Week 1，约 5 人日）
 
-- [ ] **P010** Mock OpenAI-compatible 模型：脚本化响应、tool calls、延迟/挂起、记录 calls/tokens
-- [ ] **P011** Event injector + outbound capture：GitHub/Webhook 两种驱动；重复投递
-- [ ] **P012** Runner：YAML 加载、步骤调度、超时、清理、3 次重复运行
-- [ ] **P013** 断言与指标：work items、outbound、首次回复、模型调用、重复项、恢复耗时
-- [ ] **P014** CLI：`run` / `list` / `validate`；`--subject`、`--scenario`、`--json`
-- [ ] **P015** Fixture adapter：只验证评测器，不是产品；提供一个最小可测对象
-- [ ] **P016** C1 `direct-request` + C2 `duplicate-delivery`
-- [ ] **P017** 报告生成器：JSON + Markdown；原始 trace 落盘
+- [x] **P010** Mock OpenAI-compatible 模型：脚本化响应、tool calls、SSE、记录 calls（延迟/挂起未用于 MVP）
+- [x] **P011** Event injector + outbound capture：本地事件注入与重复投递语义
+- [x] **P012** Runner：YAML 加载、超时、每次运行清理 workDir、3 次重复运行
+- [x] **P013** 断言与指标：tickets、outbound、模型调用、重复项、运行耗时
+- [x] **P014** CLI：`run` / `list` / `validate`；`--subjects`、`--suite`、`--out`、`--repeats`
+- [x] **P015** Fixture adapter：只验证评测器，不是产品
+- [x] **P016** C1 `direct-request` + C2 `duplicate-delivery`
+- [x] **P017** 报告生成器：JSON + Markdown + raw trace（HTML 推迟到 v0.2）
 
 **验收**：fixture 对象连续 3 次通过 C1/C2；无网络；报告可读。
 
 ### M2 opensuperagent 适配（Week 2，约 5 人日）
 
-- [ ] **P020** 版本钉住；临时 data root/端口；provider baseUrl 指向 mock 模型
-- [ ] **P021** 签名 webhook 注入（`/hooks/webhook`）；重复投递支持
-- [ ] **P022** 回调 URL 捕获出站；`/api/tasks`、`/api/tasks/:id`、`/api/overview` 快照
-- [ ] **P023** C3 `thread-burst-batching`、C4 `noise-suppression`、C5 `unauthorized-sender`
-- [ ] **P024** 报告增加 subject 元数据与 adapter 模式
-- [ ] **P025** 适配器文档 + 故障排查
+- [x] **P020** 版本钉住；临时 data root/端口；provider baseUrl 指向 mock 模型
+- [x] **P021** 签名 webhook 注入（`/hooks/webhook`）；重复投递支持
+- [x] **P022** 回调 URL 捕获出站；`/api/tasks` 快照（`/api/overview` 未使用）
+- [!] **P023** C5 `unauthorized-sender` 已完成；C3/C4 推迟到 v0.2
+- [x] **P024** 报告增加 subject 元数据与 adapter 模式
+- [x] **P025** 适配器说明写入 README / SPEC（独立故障排查文档暂缓）
 
 **验收**：5 个场景通过；3/3 一致；不访问真实网络。
 
 ### M3 LofiSu 适配（Week 3，约 5 人日）
 
-- [ ] **P030** 进程内适配：`Runtime.create({ home, model, now, batchWindowMs, admission })` + `ingest`
-- [ ] **P031** 从 SQLite outbox/store 观测结果；scripted model 注入
-- [ ] **P032** 重启模拟：销毁并重建 Runtime（同一 home），验证不重放/不重复
-- [ ] **P033** C6 `concurrent-threads`、C7 `restart-recovery`
-- [ ] **P034** 跨实现报告 + adapter 模式/公平性说明
-- [ ] **P035** 适配器文档
+- [x] **P030** 进程内适配：`Runtime.create({ home, model, ... })` + `ingest`
+- [x] **P031** 从 SQLite outbox/store 观测结果；scripted model 注入
+- [x] **P032** 重启模拟：销毁并重建 Runtime（同一 home），验证不重放/不重复
+- [!] **P033** C7 `restart-recovery` 已完成；C6 `concurrent-threads` 推迟到 v0.2
+- [x] **P034** 跨实现报告 + adapter 模式/公平性说明
+- [x] **P035** 适配器说明写入 README / SPEC
 
 **验收**：7 个场景 × 2 个对象；3/3 一致；原始 trace 可复查。
 
@@ -210,8 +228,8 @@ export interface SubjectAdapter {
 
 - [ ] **P040** Spike：用官方 `Runtime` + fake DSH host 跑通一个触发（1 天）
 - [ ] **P041** Spike 成功则接 C1–C3；失败则记录 blocker + v0.2 roadmap
-- [ ] **P042** Capability gating：未暴露的能力输出 `not_tested`，不判负
-- [ ] **P043** 适配说明：版本固定、内部 API 风险、升级策略
+- [x] **P042** Capability gating：缺少能力时整个场景输出 `not_tested`，不判负；有单元测试
+- [ ] **P043** 官方原型适配说明：版本固定、内部 API 风险、升级策略（适配未开始）
 
 **验收**：成功则作为 beta 进入报告；失败则文档化，不阻塞 v0.1。
 
@@ -219,7 +237,7 @@ export interface SubjectAdapter {
 
 - [ ] **P050** 静态 HTML 报告（P1）
 - [ ] **P051** `results/v0.1/`：summary、raw traces、复现命令、环境说明
-- [ ] **P052** 中英 README：why、quickstart、matrix、limitations、non-goals、non-official 声明
+- [x] **P052** 中英 README：why、quickstart、matrix、limitations、non-goals、non-official 声明
 - [ ] **P053** npm 包（P0）+ Docker 镜像（P1）
 - [ ] **P054** 90 秒演示视频/GIF：一条命令跑出矩阵 + 一个失败场景
 - [ ] **P055** 首篇中文对比文章 + 英文 post

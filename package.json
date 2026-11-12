@@ -1,0 +1,39 @@
+{
+  "name": "deepseek-superagent-bench",
+  "version": "0.1.0",
+  "description": "Unofficial reproducible behavioral benchmark for proactive super-agent implementations",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "superagent-bench": "dist/cli.js"
+  },
+  "files": ["dist", "scenarios", "schemas", "README.md", "README.zh-CN.md", "LICENSE"],
+  "scripts": {
+    "bench": "tsx src/cli.ts",
+    "bench:core": "tsx src/cli.ts run --suite core --subjects fixture,opensuperagent,lofisu --repeats 3",
+    "bench:fixture": "tsx src/cli.ts run --suite core --subjects fixture --repeats 3",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc -p tsconfig.build.json",
+    "prepare:subjects": "node scripts/prepare-subjects.mjs"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.0",
+    "yaml": "^2.5.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/node": "^22.7.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

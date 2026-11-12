@@ -1,0 +1,21 @@
+id: c1-direct-request
+name: Direct request from an allowed user
+description: >
+  An allowed maintainer asks the agent directly in an issue thread. The subject
+  should accept the work and produce at least one outbound reply, without
+  duplicating it.
+events:
+  - id: evt-c1-001
+    kind: issue_comment
+    source: github
+    threadKey: acme/checkout#12
+    actor: alice
+    text: "@superagent-bot please fix the login timeout on checkout"
+    mentionsAgent: true
+    timestamp: "2026-01-01T00:00:00.000Z"
+policy:
+  allowedActors: [alice, bob]
+expect:
+  outboundAtLeast: 1
+  duplicateOutbound: false
+requires: [event-injection, outbound-capture]

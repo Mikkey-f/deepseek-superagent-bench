@@ -21,9 +21,14 @@ behavioral benchmark). Continue from `STATUS.md`.
 
 ## Scope
 
-v0.1 target: 7 core scenarios × 2 stable subjects (opensuperagent, LofiSu) plus an
-experimental adapter for the official prototype. Deterministic mock model and
-source; offline CI; JSON/Markdown/HTML report; bilingual docs; npm release.
+**Current MVP (2026-11):** 4 core scenarios × 2 stable subjects (opensuperagent,
+LofiSu) plus a fixture that validates the evaluator. Deterministic mock model and
+source; JSON/Markdown report with raw traces; bilingual README; offline fixture
+CI; npm tooling. Ship this before expanding.
+
+**Post-MVP v0.1:** grow to 7 core scenarios, add an experimental adapter for the
+official prototype, and consider an HTML report. New scenarios go to the v0.2
+candidate list until promoted.
 
 Non-goals: new agent runtime/UI/channels; real model or real GitHub/Feishu in CI;
 single-winner leaderboard; security exploitation; modifying subject repos.
@@ -50,8 +55,8 @@ benchmark work.
   black-box vs in-process mode. No single overall ranking in v0.1.
 - **Version pin.** Record repository, commit, version, adapter mode, and
   environment in every result.
-- **Scope discipline.** 7 core scenarios only for v0.1. New scenarios go to the
-  v0.2 candidate list in `PLAN.md` unless the owner promotes them.
+- **Scope discipline.** Keep the MVP at 4 core scenarios. New scenarios go to
+  the v0.2 candidate list in `PLAN.md` unless the owner promotes them.
 - **Security.** Use benign scenarios only. If a scenario reveals a real security
   issue, report it privately to the subject's maintainers first; do not publish
   exploit details.
@@ -65,14 +70,18 @@ benchmark work.
 
 ## Commands
 
-The toolchain is not created yet (P002). Once it exists, add the exact commands
-here and keep them in sync with `package.json`:
+Use npm (pnpm global install was declined). Keep these in sync with
+`package.json`:
 
 ```bash
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm bench:core        # placeholder until P014
+npm ci                     # CI / clean install
+npm run typecheck
+npm run lint
+npm test                   # unit + fixture determinism tests
+npm run build
+npm run bench:fixture      # offline fixture suite, no subject repos
+npm run prepare:subjects   # copy sibling subject repos into results/subjects
+npm run bench:core         # fixture + opensuperagent + lofisu, 3 repeats
 ```
 
 ## Session workflow
@@ -84,6 +93,6 @@ pnpm bench:core        # placeholder until P014
 5. Update `PLAN.md` checkboxes only for tasks with evidence.
 6. Before ending the session, leave a handoff note in `STATUS.md`.
 
-When the repo becomes a git repository, use branches and PRs; never commit
-directly to `main`, and never force-push a shared branch. Add CI before merging
-runtime changes.
+This repository already has a remote. Use feature branches and PRs; never commit
+directly to `main`, and never force-push a shared branch. CI must be green before
+a runtime change merges.
