@@ -26,6 +26,11 @@ interface LofisuOutboxRow {
 
 interface LofisuTicket {
   ended?: unknown;
+  assignments?: Array<{ state?: string }>;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 interface LofisuRuntime {
@@ -80,6 +85,7 @@ export class LofisuAdapter implements SubjectAdapter {
     "ticket-count",
     "eval-count",
     "restart",
+    "work-active",
   ]);
 
   readonly version: string;
@@ -92,6 +98,8 @@ export class LofisuAdapter implements SubjectAdapter {
   private allowedActors: string[] = [];
   private lastOutbound: Outbound[] = [];
   private lastSnapshot: StateSnapshot = {};
+  private midFlight = false;
+  private workDelayMs = 0;
 
   constructor() {
     this.root = this.resolveRoot();
@@ -104,6 +112,8 @@ export class LofisuAdapter implements SubjectAdapter {
   async start(ctx: BenchContext): Promise<void> {
     this.home = ctx.workDir;
     this.allowedActors = ctx.scenario.policy?.allowedActors ?? [];
+    this.midFlight = ctx.scenario.restartMode === "mid-flight";
+    this.workDelayMs = ctx.scenario.workDelayMs;
     await mkdir(this.home, { recursive: true });
 
     const modulePath = join(this.root, "src", "runtime.ts");
@@ -135,7 +145,20 @@ export class LofisuAdapter implements SubjectAdapter {
       };
       this.runtime.ingest(trigger);
     }
+    if (this.midFlight) return;
     await this.runtime.jobsSettled();
+  }
+
+  async workActive(): Promise<boolean> {
+    if (!this.runtime?.store.isOpen) return false;
+    const tickets = this.runtime.store.listDocs<LofisuTicket>("ticket");
+    return tickets.some(
+      (ticket) =>
+        !ticket.ended &&
+        (ticket.assignments ?? []).some(
+          (assignment) => assignment.state === "pending" || assignment.state === "running",
+        ),
+    );
   }
 
   async outbound(): Promise<Outbound[]> {
@@ -204,7 +227,12 @@ export class LofisuAdapter implements SubjectAdapter {
       model: {
         name: "BenchScriptedModel",
         classify: () => ({ pass: true, strength: "explicit", reason: "bench" }),
-        complete: async () => ({ text: "bench-ack" }),
+        complete: async (request: { role?: string }) => {
+          if (this.workDelayMs > 0 && request.role === "worker") {
+            await sleep(this.workDelayMs);
+          }
+          return { text: "bench-ack" };
+        },
       },
       env: {},
       jobDelayMs: 0,

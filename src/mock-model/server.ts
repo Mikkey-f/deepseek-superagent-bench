@@ -27,6 +27,11 @@ interface CompletionResult {
   completion: Record<string, unknown>;
   content: string | null;
   tool?: { name: string; arguments: string; id: string };
+  delayMs: number;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function readBody(req: IncomingMessage): Promise<string> {
@@ -114,7 +119,13 @@ function buildCompletion(
     },
   };
 
-  return { kind: tool ? "tool" : "content", completion, content, tool };
+  return {
+    kind: tool ? "tool" : "content",
+    completion,
+    content,
+    tool,
+    delayMs: rule?.delayMs ?? 0,
+  };
 }
 
 function sendStream(res: ServerResponse, result: CompletionResult): void {
@@ -252,6 +263,8 @@ export class MockModelServer implements MockModelController {
       request: body,
       response: result.completion,
     });
+
+    if (result.delayMs > 0) await sleep(result.delayMs);
 
     if (body.stream === true) {
       sendStream(res, result);

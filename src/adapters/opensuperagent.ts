@@ -67,6 +67,7 @@ export class OpenSuperAgentAdapter implements SubjectAdapter {
     "state-snapshot",
     "ticket-count",
     "restart",
+    "work-active",
   ]);
 
   readonly version: string;
@@ -86,6 +87,8 @@ export class OpenSuperAgentAdapter implements SubjectAdapter {
   private seq = 0;
   private logs: string[] = [];
   private lastSnapshot: StateSnapshot = {};
+  private midFlight = false;
+  private workDelayMs = 0;
 
   constructor() {
     this.root = this.resolveRoot();
@@ -129,6 +132,7 @@ export class OpenSuperAgentAdapter implements SubjectAdapter {
                 '{"outcome":"completed","notice":"Done: login timeout fixed","summary":"Mock worker completed the task."}\n' +
                 "TASK_RESULT",
             },
+            delayMs: this.workDelayMs,
           };
         }
         return { content: "Mock model: acknowledged." };
@@ -142,6 +146,8 @@ export class OpenSuperAgentAdapter implements SubjectAdapter {
     this.configPath = join(this.workDir, "opensuperagent.config.yaml");
     this.mockModelUrl = ctx.mockModelUrl;
     this.allowedActors = ctx.scenario.policy?.allowedActors ?? [];
+    this.midFlight = ctx.scenario.restartMode === "mid-flight";
+    this.workDelayMs = ctx.scenario.workDelayMs;
     this.outboundMessages = [];
     this.seq = 0;
     this.logs = [];
@@ -186,8 +192,21 @@ export class OpenSuperAgentAdapter implements SubjectAdapter {
         throw new Error(`opensuperagent webhook ${response.status}: ${body}`);
       }
     }
+    if (this.midFlight) return;
     await this.waitForTasks();
     await this.waitForOutbound();
+  }
+
+  async workActive(): Promise<boolean> {
+    if (!this.port) return false;
+    try {
+      const body = (await this.request("/api/tasks")) as { tasks?: OsaTask[] };
+      return (body.tasks ?? []).some((task) =>
+        ["pending", "active", "waiting"].includes(task.status),
+      );
+    } catch {
+      return false;
+    }
   }
 
   async outbound(): Promise<Outbound[]> {

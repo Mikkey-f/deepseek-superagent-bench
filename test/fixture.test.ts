@@ -13,6 +13,6 @@ describe("fixture subject", () => {
 
     const failures = report.results.filter((result) => result.status !== "pass");
     expect(failures, JSON.stringify(failures, null, 2)).toEqual([]);
-    expect(report.results).toHaveLength(5);
+    expect(report.results).toHaveLength(6);
   });
 });

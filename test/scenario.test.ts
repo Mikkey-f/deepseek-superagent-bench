@@ -8,6 +8,7 @@ describe("scenario loading", () => {
       "c1-direct-request",
       "c2-duplicate-delivery",
       "c3-concurrent-duplicate-delivery",
+      "c4-mid-flight-restart",
       "c5-unauthorized-sender",
       "c7-restart-recovery",
     ]);
@@ -18,6 +19,7 @@ describe("scenario loading", () => {
     for (const id of [
       "c2-duplicate-delivery",
       "c3-concurrent-duplicate-delivery",
+      "c4-mid-flight-restart",
       "c7-restart-recovery",
     ]) {
       const scenario = scenarios.find((candidate) => candidate.id === id);
@@ -31,6 +33,15 @@ describe("scenario loading", () => {
     for (const scenario of scenarios) {
       expect(scenario.delivery).toBe(
         scenario.id === "c3-concurrent-duplicate-delivery" ? "concurrent" : "sequential",
+      );
+    }
+  });
+
+  it("loads mid-flight restart only for C4", async () => {
+    const scenarios = await loadSuite(process.cwd(), "core");
+    for (const scenario of scenarios) {
+      expect(scenario.restartMode).toBe(
+        scenario.id === "c4-mid-flight-restart" ? "mid-flight" : "after-settle",
       );
     }
   });

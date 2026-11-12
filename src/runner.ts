@@ -90,6 +90,29 @@ async function waitForSettle(
   );
 }
 
+async function waitForWorkActive(
+  adapter: SubjectAdapter,
+  scenario: Scenario,
+  log: (message: string) => void,
+): Promise<void> {
+  if (!adapter.workActive) {
+    throw new Error(`${adapter.id}: mid-flight restart requires workActive()`);
+  }
+  const started = Date.now();
+  while (Date.now() - started < scenario.timeoutMs) {
+    try {
+      if (await adapter.workActive()) return;
+    } catch {
+      // The subject may still be starting work; retry until the deadline.
+    }
+    await sleep(100);
+  }
+  log(`${adapter.id}/${scenario.id}: no active work observed before mid-flight restart`);
+  throw new Error(
+    `${adapter.id}/${scenario.id}: no active work observed within ${scenario.timeoutMs}ms`,
+  );
+}
+
 async function runOnce(
   adapter: SubjectAdapter,
   scenario: Scenario,
@@ -111,6 +134,7 @@ async function runOnce(
   let checks: CheckResult[] = [];
   let status: ScenarioStatus = "error";
   let error: string | undefined;
+  let midFlightObserved = false;
 
   try {
     adapter.configureMockModel?.(mock);
@@ -123,14 +147,25 @@ async function runOnce(
     } else {
       await adapter.inject(scenario.events);
     }
-    await waitForSettle(adapter, scenario, log);
+    const midFlightRestart = scenario.restart && scenario.restartMode === "mid-flight";
+    if (!midFlightRestart) {
+      await waitForSettle(adapter, scenario, log);
+    }
 
     if (scenario.restart) {
-      if (adapter.restart) {
+      if (!adapter.restart) {
+        log(`${adapter.id}/${scenario.id}: restart unsupported; scenario will be capability-gated`);
+      } else if (scenario.restartMode === "mid-flight" && !adapter.workActive) {
+        log(
+          `${adapter.id}/${scenario.id}: work-active unsupported; scenario will be capability-gated`,
+        );
+      } else {
+        if (scenario.restartMode === "mid-flight") {
+          await waitForWorkActive(adapter, scenario, log);
+          midFlightObserved = true;
+        }
         await adapter.restart();
         await waitForSettle(adapter, scenario, log);
-      } else {
-        log(`${adapter.id}/${scenario.id}: restart unsupported; scenario will be capability-gated`);
       }
     }
 
@@ -173,6 +208,8 @@ async function runOnce(
         status,
         error,
         durationMs,
+        restartMode: scenario.restart ? scenario.restartMode : undefined,
+        midFlightObserved,
       },
       null,
       2,
@@ -188,6 +225,7 @@ async function runOnce(
     ...(snapshot ? { snapshot } : {}),
     modelCalls,
     durationMs,
+    ...(midFlightObserved ? { midFlightObserved } : {}),
     ...(error ? { error } : {}),
     tracePath,
   };
