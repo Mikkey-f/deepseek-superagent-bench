@@ -1,11 +1,12 @@
 # DeepSeek SuperAgent Bench — STATUS
 
 > **Last updated**: 2026-11-12
-> **Current phase**: MVP shipped to `main` via PRs #1–#3; awaiting owner acceptance
+> **Current phase**: MVP shipped to `main` via PRs #1–#4; gate-fix PR #5 has
+> green CI and awaits owner acceptance/merge
 > **Current milestone**: public repo + core + 2 subjects × 4 scenarios + report
-> **Next action**: owner runs `npm run bench:fixture` and inspects the report;
-> then decide the post-MVP scope (C3/C4/C6, official prototype adapter, or
-> community feedback).
+> **Next action**: review/merge gate-fix PR #5, then run `npm run bench:fixture`
+> and inspect the report; then decide the post-MVP scope (C3/C4/C6, official
+> prototype adapter, or community feedback).
 > **Owner**: user; **implementation**: Claude Code
 > **Canonical plan**: [`PLAN.md`](PLAN.md) · **Spec**: [`docs/SPEC.md`](docs/SPEC.md)
 
@@ -39,7 +40,10 @@
 - [x] Capability gating: a missing required capability makes the whole scenario
       `not_tested`; covered by unit tests.
 - [x] README (English + Chinese), `docs/SPEC.md`, CI workflow.
-- [x] Feature branch PR #1 merged with green CI; `main` branch protection enabled.
+- [x] Feature branch PR #1 and docs PRs #2–#4 merged with green CI; `main`
+      branch protection enabled.
+- [ ] Gate-fix PR #5 merged; it adds `.gitattributes` and asserts ticket counts
+      for C2/C7.
 - [ ] Owner acceptance.
 - [x] No npm publish in the MVP (intentional).
 
@@ -65,9 +69,9 @@ Environment: Node v22.14.0, npm 10.9.2, git 2.49.0, gh 2.97.0 authenticated as
 |---|---|
 | `npm run typecheck` | pass, no output |
 | `npm run lint` | pass, 21 files checked |
-| `npm test` | 4 files / 7 tests pass; fixture suite 4 scenarios × 3 repeats in ~11 s |
+| `npm test` | 4 files / 9 tests pass; fixture suite 4 scenarios × 3 repeats in ~11 s |
 | `npm run bench:fixture` | pass 4/4, 3/3 repeats |
-| `npm run bench:core` | pass 12/12 scenario×subject combinations, 3/3 repeats |
+| `npm run bench:core` | pass 12/12 scenario×subject combinations, 3/3 repeats; C2/C7 now include the `tickets-created` check |
 
 ### Reference matrix (2026-11-12)
 
@@ -105,9 +109,14 @@ Artifacts (gitignored, local): `results/latest/report.md`,
 - Final evidence PR:
   https://github.com/Mikkey-f/deepseek-superagent-bench/pull/3; merge commit
   `d61bdc3`.
-- CI jobs: PR #1 pass in 36 s, PR #2 pass in 34 s, PR #3 pass in 33 s; main push
-  runs after each merge pass. All on Node 22 (Ubuntu), job name
-  `typecheck / lint / test / fixture`.
+- Release-evidence tip PR:
+  https://github.com/Mikkey-f/deepseek-superagent-bench/pull/4; merge commit
+  `d439ccc`.
+- Gate-fix PR: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/5;
+  green CI, merge pending.
+- CI jobs: PR #1 pass in 36 s, PR #2 pass in 34 s, PR #3 pass in 33 s, PR #4
+  pass in 36 s, PR #5 pass in 37 s; main push runs after each merge pass. All on
+  Node 22 (Ubuntu), job name `typecheck / lint / test / fixture`.
 - Branch protection on `main`: PR required, required check
   `typecheck / lint / test / fixture` (strict/up-to-date), admins enforced, force
   pushes and branch deletion disabled.
@@ -131,12 +140,30 @@ Artifacts (gitignored, local): `results/latest/report.md`,
 - C5: added `ticketsCreated: 0`, so “no work” is observable rather than inferred
   only from outbound.
 
+### Gate review (2026-11-12)
+
+- Found a Windows-only failure: `npm run lint` failed on a clean checkout
+  because Git wrote CRLF and there was no `.gitattributes`; the Linux CI stayed
+  green. Added `* text=auto eol=lf` and normalized the working tree. Lint now
+  passes on Windows (`21 files checked`).
+- Closed a duplicate-work blind spot: C2 and C7 previously asserted only
+  outbound. Both now require `ticket-count` and assert exactly one ticket; a
+  subject that creates two tickets can no longer pass. Added unit coverage.
+- `prepare:subjects` now warns if a subject checkout has uncommitted changes, so
+  the recorded commit is not presented as the whole run.
+- Re-ran the full matrix on the tightened scenarios: 12/12 pass, 3/3 repeats;
+  C2/C7 each report `tickets-created: pass`. `npm test` is 9/9.
+- Gate-fix PR: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/5;
+  CI run 43190697885 passed in 37 s.
+
 ### Known caveats
 
 - C7 restarts after the initial settle window; it validates durable state and
   non-replay, not mid-flight crash recovery.
 - In-process LofiSu outbound is read from its durable outbox; that is not proof
   of real channel delivery. Adapter mode is disclosed in the report.
+- C2 permits two outbound acknowledgements for one ticket; it asserts one unit
+  of work, not exactly one message.
 - Some opensuperagent dependencies declare Node ≥22.19. The reference run on
   Node 22.14 completed successfully, but real-subject runs should prefer a
   Node 22.19+ toolchain. CI exercises only the fixture suite.
@@ -158,8 +185,9 @@ Artifacts (gitignored, local): `results/latest/report.md`,
 
 ## Next actions
 
-1. Owner acceptance: run `npm run bench:fixture` or `npm run bench:core`, then
-   inspect `results/latest/report.md` and one trace.
+1. Review and merge PR #5; then run owner acceptance with
+   `npm run bench:fixture` or `npm run bench:core`, and inspect
+   `results/latest/report.md` and one trace.
 2. If accepted, tag the repository/release and decide the post-MVP scope; do not
    add C3/C4/C6 or the official prototype without owner promotion.
 3. Only after the bench MVP ships, consider resuming `superagent-runtime/`.

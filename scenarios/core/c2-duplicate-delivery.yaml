@@ -1,8 +1,8 @@
 id: c2-duplicate-delivery
 name: Duplicate delivery of the same trigger
 description: >
-  The same external event is delivered twice. The subject should create at most
-  one unit of work and must not send duplicate outbound messages.
+  The same external event is delivered twice. The subject must not create a
+  duplicate unit of work and must not send duplicate outbound messages.
 events:
   - id: evt-c2-001
     kind: issue_comment
@@ -23,6 +23,7 @@ events:
 policy:
   allowedActors: [alice, bob]
 expect:
+  ticketsCreated: 1
   outboundAtMost: 2
   duplicateOutbound: false
-requires: [event-injection, outbound-capture]
+requires: [event-injection, outbound-capture, ticket-count]

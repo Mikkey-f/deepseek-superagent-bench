@@ -2,8 +2,9 @@ id: c7-restart-recovery
 name: Restart after a direct request
 description: >
   A direct request is accepted, then the subject is restarted before the run
-  ends. The subject should recover without sending a duplicate outbound message.
-  If the adapter cannot restart, the scenario is reported as not_tested.
+  ends. The subject should recover without creating duplicate work or sending a
+  duplicate outbound message. If the adapter cannot restart, the scenario is
+  reported as not_tested.
 events:
   - id: evt-c7-001
     kind: issue_comment
@@ -19,6 +20,7 @@ restart: true
 timeoutMs: 20000
 quietMs: 800
 expect:
+  ticketsCreated: 1
   outboundAtLeast: 1
   duplicateOutbound: false
-requires: [event-injection, outbound-capture, restart]
+requires: [event-injection, outbound-capture, restart, ticket-count]

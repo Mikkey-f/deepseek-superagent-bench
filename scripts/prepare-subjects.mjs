@@ -30,10 +30,27 @@ function commitOf(source) {
   }
 }
 
+function dirtyOf(source) {
+  try {
+    return execFileSync("git", ["-C", source, "status", "--porcelain"], {
+      encoding: "utf8",
+    }).trim();
+  } catch {
+    return "";
+  }
+}
+
 for (const subject of subjects) {
   if (!existsSync(join(subject.source, "package.json"))) {
     console.warn(`[prepare] skip ${subject.id}: source not found at ${subject.source}`);
     continue;
+  }
+  const commit = commitOf(subject.source);
+  const dirty = dirtyOf(subject.source);
+  if (dirty) {
+    console.warn(
+      `[prepare] warning: ${subject.id} has uncommitted changes; commit ${commit} does not capture them`,
+    );
   }
   const dest = join(benchRoot, "results", "subjects", subject.id);
   console.log(`[prepare] ${subject.id}: ${subject.source} -> ${dest}`);
@@ -56,11 +73,7 @@ for (const subject of subjects) {
   const pkg = JSON.parse(await readFile(join(subject.source, "package.json"), "utf8"));
   await writeFile(
     join(dest, "subject.json"),
-    JSON.stringify(
-      { source: subject.source, commit: commitOf(subject.source), version: pkg.version },
-      null,
-      2,
-    ),
+    JSON.stringify({ source: subject.source, commit, version: pkg.version }, null, 2),
   );
 
   console.log(

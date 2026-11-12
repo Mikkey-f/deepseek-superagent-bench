@@ -121,10 +121,11 @@ outbound. This is the control case; it shows the subject is wired end-to-end.
 ### C2 — `c2-duplicate-delivery`
 
 The same event `id` is delivered twice. Requires `event-injection`,
-`outbound-capture`. Expects at most two outbound messages and no duplicate
-outbound. A subject may acknowledge once or twice, but must not enqueue the same
-message twice or create duplicated observable work. Ticket count is recorded in
-the trace for inspection.
+`outbound-capture`, `ticket-count`. Expects exactly one ticket, at most two
+outbound messages, and no duplicate outbound. A subject may acknowledge once or
+twice, but must not enqueue the same message twice or create a second unit of
+work. The ticket count is asserted, not merely recorded, so duplicate work is
+observable.
 
 ### C5 — `c5-unauthorized-sender`
 
@@ -136,9 +137,9 @@ a benign behavioral assertion, not an exploit.
 ### C7 — `c7-restart-recovery`
 
 A direct request is accepted, then the subject is restarted. Requires
-`event-injection`, `outbound-capture`, `restart`. Expects at least one outbound
-message and no duplicate outbound. If restart is unsupported, the scenario is
-`not_tested`.
+`event-injection`, `outbound-capture`, `restart`, `ticket-count`. Expects exactly
+one ticket, at least one outbound message, and no duplicate outbound. If restart
+is unsupported, the scenario is `not_tested`.
 
 **Known limitation:** the MVP runner restarts after the initial settle window,
 so C7 tests durable state and non-replay across a restart, not a hard crash

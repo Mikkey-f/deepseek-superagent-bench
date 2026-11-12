@@ -31,9 +31,10 @@ fixture。这是行为矩阵，不是排行榜。评测语义见 [`docs/SPEC.md`
 | C1 | `direct-request` | 允许的用户直接请求；产生出站消息且不重复。 |
 | C2 | `duplicate-delivery` | 同一个外部事件送达两次；工作和出站消息不重复。 |
 | C5 | `unauthorized-sender` | 不在允许名单的发送者不触发工作、不产生回复、不创建工单。 |
-| C7 | `restart-recovery` | 请求被接收后重启；不产生重复出站。不支持重启时报告 `not_tested`。 |
+| C7 | `restart-recovery` | 请求被接收后重启；工作和出站消息不重复。不支持重启时报告 `not_tested`。 |
 
-`fixture` 只用于校验评测器，不是产品，也不作为正式被测对象。
+C2、C5、C7 需要工单计数能力；适配器未声明 `ticket-count` 时，这些场景报告为
+`not_tested`。`fixture` 只用于校验评测器，不是产品，也不作为正式被测对象。
 
 ## 快速开始
 
@@ -88,9 +89,10 @@ npm run bench -- run --suite core --subjects fixture,opensuperagent,lofisu --rep
 | C5 unauthorized-sender | pass 3/3 | pass 3/3 | pass 3/3 |
 | C7 restart-recovery | pass 3/3 | pass 3/3 | pass 3/3 |
 
-C2 中三个实现都只产生 1 条出站消息和 1 个工单；C5 都是 0 出站、0 工单、0 次模型调用；
-C7 重启后仍只有 1 条出站消息。完整逐项证据见本地生成的
-`results/latest/report.md` 和 `results/latest/traces/`。
+C2 中三个实现都只产生 1 条出站消息和 1 个工单，工单数量是断言项；C5 都是 0 出站、
+0 工单，0 次模型调用是观测值；C7 重启后仍只有 1 个工单和 1 条出站消息，工单数量是
+断言项。完整逐项证据见本地生成的 `results/latest/report.md` 和
+`results/latest/traces/`。
 
 ## 测什么，不测什么
 
@@ -145,6 +147,8 @@ interface SubjectAdapter {
 - **MVP 覆盖窄。** 只有 4 个场景；飞书、官方原型适配、真实投递重试不在 MVP 内。
 - **进程内抓取不等于真实投递。** 对进程内被测对象，出站可能来自持久化 outbox，
   包含尚未被真实渠道适配器投递的消息；报告会披露适配器模式。
+- **C2 允许两次确认。** 场景断言 1 个工单且没有重复出站，但被测实现可以为同一个
+  工作单元发送两条内容不同的确认消息。
 - **重启时序。** C7 在当前 MVP 中是在首轮工作 settle 之后重启，验证的是持久状态和
   非重放，不是进程中途硬崩溃恢复。
 - **通过不等于生产可用。** 它只表示该次运行、该 commit 下，这些可观察断言成立。
