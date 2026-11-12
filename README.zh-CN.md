@@ -1,5 +1,7 @@
 # deepseek-superagent-bench
 
+[![CI](https://github.com/Mikkey-f/deepseek-superagent-bench/actions/workflows/ci.yml/badge.svg)](https://github.com/Mikkey-f/deepseek-superagent-bench/actions/workflows/ci.yml)
+
 > **非官方项目，与 DeepSeek 无隶属关系。** 项目名只用于标识它所测试的设计范式。
 > 本仓库不包含 DeepSeek 的代码、Logo 或官方品牌素材。
 

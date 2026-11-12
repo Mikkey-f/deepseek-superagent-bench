@@ -1,10 +1,11 @@
 # DeepSeek SuperAgent Bench — STATUS
 
 > **Last updated**: 2026-11-12
-> **Current phase**: MVP implemented and locally verified; PR/CI handoff next
+> **Current phase**: MVP shipped to `main` via PR #1; awaiting owner acceptance
 > **Current milestone**: public repo + core + 2 subjects × 4 scenarios + report
-> **Next action**: commit on `feat/mvp-core`, push, open PR, wait for green CI,
-> merge, then collect owner acceptance.
+> **Next action**: owner runs `npm run bench:fixture` and inspects the report;
+> then decide the post-MVP scope (C3/C4/C6, official prototype adapter, or
+> community feedback).
 > **Owner**: user; **implementation**: Claude Code
 > **Canonical plan**: [`PLAN.md`](PLAN.md) · **Spec**: [`docs/SPEC.md`](docs/SPEC.md)
 
@@ -38,9 +39,9 @@
 - [x] Capability gating: a missing required capability makes the whole scenario
       `not_tested`; covered by unit tests.
 - [x] README (English + Chinese), `docs/SPEC.md`, CI workflow.
-- [ ] Feature branch PR merged with green CI; branch protection enabled.
+- [x] Feature branch PR #1 merged with green CI; `main` branch protection enabled.
 - [ ] Owner acceptance.
-- [ ] No npm publish in the MVP (intentional).
+- [x] No npm publish in the MVP (intentional).
 
 ## Daily gates
 
@@ -48,10 +49,10 @@
 |---|---|---|---|---|
 | D1 | 11-12 | public repo, scaffold, core types/schema, mock model, runner, fixture, C1/C2, CLI | fixture 3/3 stable; `npm test` green | done |
 | D2 | 11-13 | opensuperagent adapter, C1/C2/C5/C7, report JSON/MD | one real subject end-to-end; report readable | done early |
-| D3 | 11-14 | LofiSu adapter, README, CI, first PR merge | CI green; owner can run one command | in progress |
+| D3 | 11-14 | LofiSu adapter, README, CI, first PR merge | CI green; owner can run one command | done early |
 
-The D3 gate is now the release gate: commit, PR, CI, merge. LofiSu did not block;
-both subjects are integrated.
+D3 shipped on 11-12: LofiSu did not block, both subjects are integrated, PR #1
+merged with green CI, and `main` now requires the CI check and a PR.
 
 ## Evidence log
 
@@ -95,6 +96,18 @@ Observed values:
 Artifacts (gitignored, local): `results/latest/report.md`,
 `results/latest/report.json`, `results/latest/traces/`, `results/final-run.log`.
 
+### Release evidence
+
+- PR: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/1
+- Merge commit: `df41bb07e1f05b31e07225efa008ef7716085720`
+- CI run: https://github.com/Mikkey-f/deepseek-superagent-bench/actions/runs/43187293671
+  — job `typecheck / lint / test / fixture` passed in 36 s on Node 22 (Ubuntu).
+- Branch protection on `main`: PR required, required check
+  `typecheck / lint / test / fixture` (strict/up-to-date), admins enforced, force
+  pushes and branch deletion disabled.
+- Remote feature branch `feat/mvp-core` remains for history; the PR was merged
+  with a merge commit, not a squash.
+
 ### Fixes made during the MVP run
 
 - OpensuperAgent mock script: removed a broad `report|result|completed` regex
@@ -123,26 +136,24 @@ Artifacts (gitignored, local): `results/latest/report.md`,
 ## Blockers
 
 - None technical.
-- Remaining release steps: commit/push/PR, green CI, merge, branch protection,
-  owner acceptance.
+- Remaining release step: owner acceptance.
 
 ## Open decisions
 
 | Decision | Options | Recommendation | Status |
 |---|---|---|---|
-| Branch protection | required CI + PR | Require PR and the CI job after the first green run | Do after merge |
+| Branch protection | required CI + PR | Require PR and the CI job after the first green run | Done |
 | npm package publish | publish vs defer | Defer; MVP is a GitHub open-source release | Decided: no publish |
 | Report publishing | repo Markdown vs Pages | Repo Markdown + generated artifacts for now | Provisional |
 | Post-MVP scope | C3/C4/C6 vs official prototype | Take community feedback; official prototype is high-risk | Later |
 
 ## Next actions
 
-1. Commit the MVP in logical chunks on `feat/mvp-core`.
-2. Push the branch and open a PR; wait for the GitHub Actions CI job.
-3. Merge via PR, enable branch protection, and record the PR/CI result here.
-4. Owner acceptance: run `npm run bench:fixture` and inspect
-   `results/latest/report.md`.
-5. Only after the bench MVP ships, consider resuming `superagent-runtime/`.
+1. Owner acceptance: run `npm run bench:fixture` or `npm run bench:core`, then
+   inspect `results/latest/report.md` and one trace.
+2. If accepted, tag the repository/release and decide the post-MVP scope; do not
+   add C3/C4/C6 or the official prototype without owner promotion.
+3. Only after the bench MVP ships, consider resuming `superagent-runtime/`.
 
 ## Handoff protocol
 

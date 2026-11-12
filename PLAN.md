@@ -34,7 +34,8 @@
 - [x] 能力门控：缺少能力时整个场景 `not_tested`，不判负（有单元测试）。
 - [x] 中英 README、`docs/SPEC.md`、GitHub Actions workflow。
 - [x] 本地 3 次重复矩阵无 flaky/fail/error。
-- [ ] feature branch 的 PR 在 CI 全绿后合并；分支保护启用。
+- [x] feature branch 的 PR #1 在 CI 全绿后合并；`main` 分支保护启用
+  （PR + required check + enforce admins）。
 - [ ] owner 验收。
 
 ### 0.2 Post-MVP v0.1（MVP 验收后）
