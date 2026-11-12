@@ -1,7 +1,7 @@
 # DeepSeek SuperAgent Bench — STATUS
 
 > **Last updated**: 2026-11-12
-> **Current phase**: MVP shipped to `main` via PR #1/#2; awaiting owner acceptance
+> **Current phase**: MVP shipped to `main` via PRs #1–#3; awaiting owner acceptance
 > **Current milestone**: public repo + core + 2 subjects × 4 scenarios + report
 > **Next action**: owner runs `npm run bench:fixture` and inspects the report;
 > then decide the post-MVP scope (C3/C4/C6, official prototype adapter, or
@@ -102,14 +102,18 @@ Artifacts (gitignored, local): `results/latest/report.md`,
   merge commit `df41bb07e1f05b31e07225efa008ef7716085720`.
 - Release-docs PR: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/2;
   merge commit `a549b1b8f62eba45f278f8a5f1e2652abfbe4b62`.
-- CI jobs: PR #1 pass in 36 s, PR #2 pass in 34 s; main push runs after each
-  merge pass in 39 s and 40 s. All on Node 22 (Ubuntu), job name
+- Final evidence PR:
+  https://github.com/Mikkey-f/deepseek-superagent-bench/pull/3; merge commit
+  `d61bdc3`.
+- CI jobs: PR #1 pass in 36 s, PR #2 pass in 34 s, PR #3 pass in 33 s; main push
+  runs after each merge pass. All on Node 22 (Ubuntu), job name
   `typecheck / lint / test / fixture`.
 - Branch protection on `main`: PR required, required check
   `typecheck / lint / test / fixture` (strict/up-to-date), admins enforced, force
   pushes and branch deletion disabled.
-- Both PRs were merged with merge commits, not squashes. Merged feature branches
-  were deleted after merge; `main` is at `a549b1b`.
+- PRs were merged with merge commits, not squashes. Merged feature branches were
+  deleted after merge. Use `git log` for the current `main` tip; this document
+  does not pin a moving branch head.
 - Post-merge verification: `npm run bench:fixture` passes 4/4 on `main`
   (2026-11-12).
 
