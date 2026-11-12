@@ -89,7 +89,7 @@
 | LofiSu | MIT |
 | opensuperagent | Apache-2.0；注意 NOTICE 与专利条款 |
 | 本项目 | MIT（代码/文档/场景）；报告中的第三方引用按原许可 |
-| 命名 | 不使用 “DeepSeek” 作为项目名；README 明确 “unofficial, not affiliated”；发布前做一次 GitHub/npm/商标检索 |
+| 命名 | 项目名 `deepseek-superagent-bench`（owner 决定，便于发现）；README 首屏必须写明 “Unofficial, not affiliated with DeepSeek”，不使用官方 Logo/品牌素材；发布前做一次 GitHub/npm/商标检索 |
 | 署名 | 你为项目 owner/第一作者；被测仓库、官方设计文章在 Credits 中注明 |
 
 ---
@@ -98,9 +98,9 @@
 
 ### 必需（影响发布，不阻塞 Week 1）
 
-- [ ] GitHub 账号/组织名（仓库最终地址）
-- [ ] npm scope（没有就用个人 scope，如 `@yourname/superagent-bench`）
-- [ ] 项目最终名称确认（默认 `superagent-bench`）
+- [x] GitHub 账号/组织名：`Mikkey-f/deepseek-superagent-bench`
+- [ ] npm scope（MVP 不做 npm publish，发布前再定）
+- [x] 项目最终名称：`deepseek-superagent-bench`（含非官方声明）
 - [ ] 每周 review 的时间窗（建议周五 30 分钟）
 
 ### 可选（只影响 v0.2 / live 模式）
@@ -137,7 +137,7 @@
 2. 读 DSH 的 session/tool/host 接口，确认官方适配器的 fake host 成本。
 3. 读 OpenAI tool calling 与 GitHub webhook 规范，冻结 mock 模型/source 的 v0.1 子集。
 4. 快速扫一遍 SWE-bench / WPT 的 harness 设计，确定 trace 与断言的存储格式。
-5. 写 `docs/SPEC.md`，冻结 7 个场景；此后新增场景一律进 v0.2 候选。
+5. `docs/SPEC.md` 已记录 MVP 的 4 个核心场景语义（C1/C2/C5/C7）；v0.1 扩展到 7 个场景，此后新增场景一律进 v0.2 候选。
 
 ---
 
