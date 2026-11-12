@@ -10,8 +10,9 @@ for proactive super-agent implementations. It drives real implementations with
 synthetic triggers, duplicate delivery, unauthorized senders, and restarts, then
 reports what it could observe — and what it could not.
 
-**Status: MVP (2026-11).** Four core scenarios, two subjects, and a fixture that
-validates the evaluator. This is a behavioral matrix, not a leaderboard.
+**Status: MVP (2026-11).** Five core scenarios, two subjects, a fixture that
+validates the evaluator, and negative controls that prove it can fail. This is a
+behavioral matrix, not a leaderboard.
 [中文说明](README.zh-CN.md) · [Benchmark spec](docs/SPEC.md)
 
 ## Why
@@ -33,6 +34,7 @@ GitHub repository, or a real chat account.
 |---|---|---|
 | C1 | `direct-request` | An allowed user asks directly; the subject produces outbound work without duplicates. |
 | C2 | `duplicate-delivery` | The same external event arrives twice; no duplicate work or outbound. |
+| C3 | `concurrent-duplicate-delivery` | The same event arrives twice concurrently; one ticket and no duplicate outbound. |
 | C5 | `unauthorized-sender` | A sender outside the allowed list gets no ticket, no outbound, and no reply. |
 | C7 | `restart-recovery` | The subject restarts; no duplicate work or outbound. `not_tested` if restart is unsupported. |
 
@@ -104,14 +106,16 @@ Windows 11), three repeats per scenario. It is not a permanent leaderboard:
 |---|---|---|---|
 | C1 direct-request | pass 3/3 | pass 3/3 | pass 3/3 |
 | C2 duplicate-delivery | pass 3/3 | pass 3/3 | pass 3/3 |
+| C3 concurrent-duplicate-delivery | pass 3/3 | pass 3/3 | pass 3/3 |
 | C5 unauthorized-sender | pass 3/3 | pass 3/3 | pass 3/3 |
 | C7 restart-recovery | pass 3/3 | pass 3/3 | pass 3/3 |
 
 In C2 all three produced one outbound message and one ticket; the ticket count
-is asserted. In C5 all three produced zero tickets and zero outbound; zero model
-calls was observed. In C7 all three still had one ticket and one outbound
-message after restart; the ticket count is asserted. The full per-check evidence
-is in the generated `results/latest/report.md` and traces.
+is asserted. C3 produced the same result under concurrent delivery. In C5 all
+three produced zero tickets and zero outbound; zero model calls was observed. In
+C7 all three still had one ticket and one outbound message after restart; the
+ticket count is asserted. The full per-check evidence is in the generated
+`results/latest/report.md` and traces.
 
 ## What is measured
 
@@ -158,7 +162,7 @@ Adapter mode and subject commit are recorded in every report.
   behavior and fail another.
 - **Synthetic inputs.** The mock model is scripted; the event source is local.
   A real model may behave differently.
-- **MVP coverage is narrow.** Four scenarios; Feishu, the official prototype,
+- **MVP coverage is narrow.** Five scenarios; Feishu, the official prototype,
   and delivery retries are not in the MVP.
 - **In-process capture is not delivery.** For in-process subjects, outbound may
   be read from a durable outbox, including messages not yet delivered by a real
@@ -166,6 +170,9 @@ Adapter mode and subject commit are recorded in every report.
 - **C2 allows two acknowledgements.** The scenario asserts one ticket and no
   duplicate outbound, but a subject may send two distinct acknowledgement
   messages for the same unit of work.
+- **C3 concurrency is at the adapter boundary.** The two deliveries overlap at
+  `adapter.inject()`, but the benchmark does not simulate separate processes,
+  network reordering, or partition scenarios.
 - **C7 restart timing.** The MVP restarts after the initial work settles. It
   tests durable state and non-replay across a restart, not mid-flight crash
   recovery.

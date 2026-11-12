@@ -7,6 +7,7 @@ describe("scenario loading", () => {
     expect(scenarios.map((scenario) => scenario.id).sort()).toEqual([
       "c1-direct-request",
       "c2-duplicate-delivery",
+      "c3-concurrent-duplicate-delivery",
       "c5-unauthorized-sender",
       "c7-restart-recovery",
     ]);
@@ -14,10 +15,23 @@ describe("scenario loading", () => {
 
   it("asserts ticket counts for duplicate delivery and restart recovery", async () => {
     const scenarios = await loadSuite(process.cwd(), "core");
-    for (const id of ["c2-duplicate-delivery", "c7-restart-recovery"]) {
+    for (const id of [
+      "c2-duplicate-delivery",
+      "c3-concurrent-duplicate-delivery",
+      "c7-restart-recovery",
+    ]) {
       const scenario = scenarios.find((candidate) => candidate.id === id);
       expect(scenario?.expect.ticketsCreated).toBe(1);
       expect(scenario?.requires).toContain("ticket-count");
+    }
+  });
+
+  it("loads the concurrent delivery mode only for C3", async () => {
+    const scenarios = await loadSuite(process.cwd(), "core");
+    for (const scenario of scenarios) {
+      expect(scenario.delivery).toBe(
+        scenario.id === "c3-concurrent-duplicate-delivery" ? "concurrent" : "sequential",
+      );
     }
   });
 

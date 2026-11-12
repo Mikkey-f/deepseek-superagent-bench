@@ -1,0 +1,33 @@
+id: c3-concurrent-duplicate-delivery
+name: Concurrent duplicate delivery of the same trigger
+description: >
+  The same external event is delivered twice at the same time. The subject must
+  coalesce the deliveries into one unit of work and must not send duplicate
+  outbound messages. This is the racing counterpart to C2.
+events:
+  - id: evt-c3-001
+    kind: issue_comment
+    source: github
+    threadKey: acme/checkout#12
+    actor: alice
+    text: "@superagent-bot please fix the login timeout on checkout"
+    mentionsAgent: true
+    timestamp: "2026-01-01T00:00:00.000Z"
+  - id: evt-c3-001
+    kind: issue_comment
+    source: github
+    threadKey: acme/checkout#12
+    actor: alice
+    text: "@superagent-bot please fix the login timeout on checkout"
+    mentionsAgent: true
+    timestamp: "2026-01-01T00:00:05.000Z"
+delivery: concurrent
+policy:
+  allowedActors: [alice, bob]
+quietMs: 800
+expect:
+  ticketsCreated: 1
+  outboundAtLeast: 1
+  outboundAtMost: 2
+  duplicateOutbound: false
+requires: [event-injection, outbound-capture, ticket-count]

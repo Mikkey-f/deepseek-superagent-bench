@@ -21,11 +21,11 @@ behavioral benchmark). Continue from `STATUS.md`.
 
 ## Scope
 
-**Current MVP (2026-11):** 4 core scenarios × 2 stable subjects (opensuperagent,
-LofiSu) plus a fixture and three negative-control fixtures that prove the
-evaluator can fail. Deterministic mock model and source; JSON/Markdown report
-with raw traces; bilingual README; offline fixture CI; npm tooling. Ship this
-before expanding.
+**Current MVP (2026-11):** 5 core scenarios (C1/C2/C3/C5/C7) × 2 stable
+subjects (opensuperagent, LofiSu) plus a fixture and three negative-control
+fixtures that prove the evaluator can fail. Deterministic mock model and source;
+JSON/Markdown report with raw traces; bilingual README; offline fixture CI; npm
+tooling. Ship this before expanding.
 
 **Post-MVP v0.1:** grow to 7 core scenarios, add an experimental adapter for the
 official prototype, and consider an HTML report. New scenarios go to the v0.2

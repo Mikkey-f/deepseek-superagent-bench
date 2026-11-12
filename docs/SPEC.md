@@ -6,7 +6,7 @@
 - **Bench version**: 0.1.0
 - **Report schema**: `0.1`
 - **Status**: MVP, 2026-11-12
-- **Scope**: core suite, C1/C2/C5/C7, fixture + two real subjects
+- **Scope**: core suite, C1/C2/C3/C5/C7, fixture + two real subjects
 
 ## 1. Purpose and non-goals
 
@@ -77,6 +77,7 @@ events:
 policy:
   allowedActors: [alice, bob]
 restart: false
+delivery: sequential
 timeoutMs: 15000
 quietMs: 600
 requires: [event-injection, outbound-capture]
@@ -89,6 +90,7 @@ expect:
 |---|---|
 | `events[]` | Events injected in order. Reusing an `id` models redelivery of the same external event. |
 | `restart` | Run `adapter.restart()` after the initial settle window. |
+| `delivery` | `sequential` (default) passes all events in one `inject()` call; `concurrent` calls `inject()` once per event and overlaps them. |
 | `repeats` | Optional per-scenario repeat count; otherwise the CLI value applies. |
 | `timeoutMs` | Maximum settle time per phase. |
 | `quietMs` | Outbound must be unchanged for this long before a phase is considered settled. |
@@ -127,6 +129,15 @@ twice, but must not enqueue the same message twice or create a second unit of
 work. The ticket count is asserted, not merely recorded, so duplicate work is
 observable.
 
+### C3 — `c3-concurrent-duplicate-delivery`
+
+The same event `id` is delivered twice concurrently (`delivery: concurrent`).
+Requires `event-injection`, `outbound-capture`, `ticket-count`. Expects exactly
+one ticket, at least one and at most two outbound messages, and no duplicate
+outbound. This is the racing counterpart to C2: it checks whether deduplication
+holds when both deliveries overlap. Concurrency is at the adapter boundary; the
+MVP does not simulate separate processes, network reordering, or partitions.
+
 ### C5 — `c5-unauthorized-sender`
 
 An actor outside `policy.allowedActors` asks for work. Requires
@@ -158,7 +169,8 @@ For each scenario × subject × repeat:
 4. `adapter.start()` starts the subject against the mock model and the work
    directory.
 5. `adapter.inject(events)` delivers the events. Duplicate ids are delivered as
-   duplicates on purpose.
+   duplicates on purpose. With `delivery: concurrent`, the runner calls
+   `adapter.inject([event])` for each event through `Promise.all`.
 6. The runner waits for settle: outbound count must be stable for `quietMs`,
    bounded by `timeoutMs`. Reaching `outboundAtMost` early also settles the
    phase.
@@ -226,12 +238,15 @@ Rules:
   It exercises control flow, not model quality.
 - **Synthetic source.** Events are local and uniform; real GitHub/Feishu
   payloads and delivery retries are not in the MVP.
+- **C3 concurrency is adapter-boundary.** The two deliveries overlap at
+  `adapter.inject()`, but separate processes, network reordering, and partitions
+  are not simulated.
 - **Restart timing.** C7 restarts after the initial work settles, as noted in
   §5. Mid-flight crash recovery is a v0.2 candidate.
 - **In-process capture is not delivery.** For in-process subjects, outbound may
   be read from a durable outbox, including messages not yet delivered by a real
   channel adapter. The adapter mode is disclosed.
-- **Small subject set.** Two real subjects and four scenarios; absence of a
+- **Small subject set.** Two real subjects and five scenarios; absence of a
   failure is not evidence of production readiness.
 - **Windows development environment.** The reference run is on Windows 11; CI
   runs the offline fixture suite on Ubuntu. Real-subject adapters are exercised

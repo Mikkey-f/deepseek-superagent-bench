@@ -116,7 +116,13 @@ async function runOnce(
     adapter.configureMockModel?.(mock);
     const mockModelUrl = await mock.start();
     await adapter.start({ mockModelUrl, workDir, scenario, log });
-    await adapter.inject(scenario.events);
+    if (scenario.delivery === "concurrent") {
+      // The subject receives the deliveries as overlapping calls, not as a
+      // pre-batched array. Adapters must be safe for concurrent inject() calls.
+      await Promise.all(scenario.events.map((event) => adapter.inject([event])));
+    } else {
+      await adapter.inject(scenario.events);
+    }
     await waitForSettle(adapter, scenario, log);
 
     if (scenario.restart) {

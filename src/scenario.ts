@@ -34,6 +34,7 @@ const scenarioSchema = z.object({
   description: z.string().min(1),
   events: z.array(eventSchema).min(1),
   restart: z.boolean().default(false),
+  delivery: z.enum(["sequential", "concurrent"]).default("sequential"),
   repeats: z.number().int().positive().optional(),
   timeoutMs: z.number().int().positive().default(15_000),
   quietMs: z.number().int().positive().default(600),
