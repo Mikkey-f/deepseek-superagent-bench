@@ -1,5 +1,7 @@
 # deepseek-superagent-bench
 
+[![CI](https://github.com/Mikkey-f/deepseek-superagent-bench/actions/workflows/ci.yml/badge.svg)](https://github.com/Mikkey-f/deepseek-superagent-bench/actions/workflows/ci.yml)
+
 > **Unofficial. Not affiliated with DeepSeek.** The name identifies the design
 > family this suite tests. It includes no DeepSeek code, logos, or branding.
 
