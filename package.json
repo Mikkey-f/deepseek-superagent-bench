@@ -19,6 +19,7 @@
     "lint": "biome check .",
     "format": "biome format --write .",
     "test": "vitest run",
+    "bench:selftest": "vitest run test/selftest.test.ts",
     "test:watch": "vitest",
     "build": "tsc -p tsconfig.build.json",
     "prepare:subjects": "node scripts/prepare-subjects.mjs"

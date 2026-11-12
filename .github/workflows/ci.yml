@@ -40,6 +40,9 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Evaluator self-test (negative controls)
+        run: npm run bench:selftest
+
       - name: Build
         run: npm run build
 

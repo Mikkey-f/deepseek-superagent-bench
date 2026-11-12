@@ -36,6 +36,18 @@ fixture。这是行为矩阵，不是排行榜。评测语义见 [`docs/SPEC.md`
 C2、C5、C7 需要工单计数能力；适配器未声明 `ticket-count` 时，这些场景报告为
 `not_tested`。`fixture` 只用于校验评测器，不是产品，也不作为正式被测对象。
 
+### 评测器自检
+
+`npm test` 和 `npm run bench:selftest` 会运行三个故意写坏的 fixture 适配器：
+
+| 负向对照 | 预期失败 |
+|---|---|
+| `fixture-double-work` | C2 对同一事件创建两个工单；工单断言必须判负。 |
+| `fixture-replay-restart` | C7 在重启后重放出站消息；重复出站断言必须判负。 |
+| `fixture-unauthorized-work` | C5 对未授权发送者执行工作；工单和授权断言必须判负。 |
+
+它们只用于证明评测器确实能抓到错误，不是被测对象，也不会出现在参考矩阵里。
+
 ## 快速开始
 
 环境：Node.js 22+、npm。默认套件不需要任何 API Key，也不需要访问外网。
