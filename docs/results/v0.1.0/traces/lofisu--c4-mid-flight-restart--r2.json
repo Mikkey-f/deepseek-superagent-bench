@@ -1,0 +1,79 @@
+{
+  "scenario": "c4-mid-flight-restart",
+  "subject": "lofisu",
+  "repeat": 2,
+  "events": [
+    {
+      "id": "evt-c4-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "outbound": [
+    {
+      "id": "outbox_1",
+      "threadKey": "acme/checkout#12",
+      "body": "Acknowledged “@superagent-bot please fix the login timeout on checkout”. Working on it.",
+      "createdAt": "2026-11-12T10:03:37.351Z",
+      "destination": "im",
+      "metadata": {
+        "status": "pending",
+        "replyId": "reply_1",
+        "idempotencyKey": "reply_1",
+        "ticketId": "ticket_1"
+      }
+    }
+  ],
+  "snapshot": {
+    "tickets": 1,
+    "openTickets": 1,
+    "endedTickets": 0,
+    "evals": 1,
+    "decisions": 1,
+    "outbound": 1
+  },
+  "modelCalls": [],
+  "adapterLogs": [],
+  "checks": [
+    {
+      "id": "outbound-at-least",
+      "label": "outbound messages at least",
+      "status": "pass",
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "id": "outbound-at-most",
+      "label": "outbound messages at most",
+      "status": "pass",
+      "expected": 2,
+      "actual": 1
+    },
+    {
+      "id": "no-duplicate-outbound",
+      "label": "no duplicate outbound",
+      "status": "pass",
+      "expected": "no duplicate (threadKey, body) or id",
+      "actual": {
+        "duplicates": [],
+        "duplicateIds": 0
+      }
+    },
+    {
+      "id": "tickets-created",
+      "label": "tickets created",
+      "status": "pass",
+      "expected": 1,
+      "actual": 1
+    }
+  ],
+  "status": "pass",
+  "durationMs": 4265,
+  "restartMode": "mid-flight",
+  "midFlightObserved": true
+}

@@ -81,6 +81,7 @@ npm run typecheck
 npm run lint
 npm test                   # unit + fixture determinism + negative-control tests
 npm run bench:selftest     # explicit evaluator negative-control test
+npm run snapshot:results   # sanitize results into docs/results/v0.1.0
 npm run build
 npm run bench:fixture      # offline fixture suite, no subject repos
 npm run prepare:subjects   # copy sibling subject repos into results/subjects

@@ -1,12 +1,12 @@
 # DeepSeek SuperAgent Bench — STATUS
 
 > **Last updated**: 2026-11-12
-> **Current phase**: MVP plus post-MVP P0/C3/C4 shipped to `main`; release
-> packaging and a final owner acceptance run remain
+> **Current phase**: MVP plus post-MVP P0/C3/C4 shipped; v0.1.0 release
+> snapshot and articles prepared in the release PR; tag after merge
 > **Current milestone**: 6 core scenarios × 2 real subjects + fixture +
-> negative controls; 18/18 local matrix pass
-> **Next action**: run/refresh release acceptance evidence, publish pinned
-> results and a release tag, then resume `superagent-runtime/`
+> negative controls; 18/18 local matrix pass; pinned results published
+> **Next action**: merge the release PR, create the `v0.1.0` tag/release, then
+> resume `superagent-runtime/`
 > **Owner**: user; **implementation**: Claude Code
 > **Canonical plan**: [`PLAN.md`](PLAN.md) · **Spec**: [`docs/SPEC.md`](docs/SPEC.md)
 
@@ -60,7 +60,11 @@
       is recorded, and no duplicate work/outbound appears. PR #8.
 - [ ] C6 concurrent threads / thread isolation.
 - [ ] Delivery retry and approval/mandate scenarios (v0.2 candidates).
-- [ ] Pinned public results snapshot + GitHub Release + article.
+- [x] Pinned public results snapshot at
+      [`docs/results/v0.1.0`](docs/results/v0.1.0/) (release PR).
+- [x] Chinese and English articles under [`docs/articles/`](docs/articles/)
+      (release PR).
+- [ ] GitHub Release `v0.1.0` tag (created after the release PR merges).
 - [ ] Real-subject CI/nightly runs (CI currently exercises the fixture only).
 - [ ] Official prototype adapter (timeboxed, experimental).
 
@@ -141,6 +145,10 @@ matrix.
 - Negative controls PR #6: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/6
 - C3 PR #7: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/7
 - C4 PR #8: https://github.com/Mikkey-f/deepseek-superagent-bench/pull/8
+- Release PR: pinned results, release notes, Chinese/English articles.
+- Results snapshot: [`docs/results/v0.1.0`](docs/results/v0.1.0/); release
+  notes: [`docs/releases/v0.1.0.md`](docs/releases/v0.1.0.md); tag:
+  `<created after merge>`.
 - CI jobs: PR #5 37 s, PR #6 47 s, PR #7 54 s, PR #8 55 s; main push after each
   merge passed (latest main run: 1 m 2 s). All on Node 22 (Ubuntu), job name
   `typecheck / lint / test / fixture`.
@@ -201,9 +209,10 @@ matrix.
 
 ## Next actions
 
-1. Run release acceptance: `npm run bench:core`, inspect
+1. Merge the release PR after CI; create the `v0.1.0` tag and GitHub Release
+   from `docs/releases/v0.1.0.md`.
+2. Optional release acceptance: `npm run bench:core`, then inspect
    `results/latest/report.md` and one C4 trace.
-2. Publish pinned results and a GitHub Release; write the Chinese/English post.
 3. Optionally add C6 or a real-subject CI job if community feedback warrants it.
 4. Resume `superagent-runtime/`; do not expand the bench further without owner
    promotion.

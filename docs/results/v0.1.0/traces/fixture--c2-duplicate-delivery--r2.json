@@ -1,0 +1,72 @@
+{
+  "scenario": "c2-duplicate-delivery",
+  "subject": "fixture",
+  "repeat": 2,
+  "events": [
+    {
+      "id": "evt-c2-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "evt-c2-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:05.000Z"
+    }
+  ],
+  "outbound": [
+    {
+      "id": "fixture-out-1",
+      "threadKey": "acme/checkout#12",
+      "body": "Acknowledged request on acme/checkout#12: @superagent-bot please fix the login timeout on checkout",
+      "createdAt": "2026-11-12T10:02:13.295Z"
+    }
+  ],
+  "snapshot": {
+    "tickets": 1,
+    "openTickets": 1,
+    "endedTickets": 0,
+    "outbound": 1
+  },
+  "modelCalls": [],
+  "adapterLogs": [],
+  "checks": [
+    {
+      "id": "outbound-at-most",
+      "label": "outbound messages at most",
+      "status": "pass",
+      "expected": 2,
+      "actual": 1
+    },
+    {
+      "id": "no-duplicate-outbound",
+      "label": "no duplicate outbound",
+      "status": "pass",
+      "expected": "no duplicate (threadKey, body) or id",
+      "actual": {
+        "duplicates": [],
+        "duplicateIds": 0
+      }
+    },
+    {
+      "id": "tickets-created",
+      "label": "tickets created",
+      "status": "pass",
+      "expected": 1,
+      "actual": 1
+    }
+  ],
+  "status": "pass",
+  "durationMs": 658,
+  "midFlightObserved": false
+}

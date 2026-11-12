@@ -1,8 +1,8 @@
 node_modules/
 dist/
 coverage/
-results/
-work/
+/results/
+/work/
 *.log
 .DS_Store
 .env

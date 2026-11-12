@@ -11,7 +11,10 @@
 
 **状态：MVP（2026-11）。** 6 个核心场景、2 个真实被测实现、一个用于校验评测器本身的
 fixture，以及证明评测器能判负的负向对照。这是行为矩阵，不是排行榜。评测语义见
-[`docs/SPEC.md`](docs/SPEC.md)。
+[`docs/SPEC.md`](docs/SPEC.md)；固定结果见
+[`docs/results/v0.1.0`](docs/results/v0.1.0/)；文章见
+[中文版](docs/articles/2026-11-12-proactive-agent-benchmark.zh-CN.md) /
+[English](docs/articles/2026-11-12-proactive-agent-benchmark.md)。
 
 ## 为什么做这个
 
@@ -186,6 +189,10 @@ src/report.ts          JSON / Markdown 报告
 test/                  场景、评测器、mock 模型、fixture 测试
 docs/SPEC.md           评测语义与场景规范
 docs/REFERENCES.md     设计来源与外部资料
+docs/results/v0.1.0/   公开固定结果与脱敏 trace
+docs/articles/         中文/英文文章
+docs/releases/         release notes
+scripts/snapshot-results.mjs  结果快照与脱敏脚本
 ```
 
 ## 被评测项目与致谢

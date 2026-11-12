@@ -241,11 +241,11 @@ export interface SubjectAdapter {
 ### M5 报告与发布（Week 4–5，约 5 人日）
 
 - [ ] **P050** 静态 HTML 报告（P1）
-- [ ] **P051** `results/v0.1/`：summary、raw traces、复现命令、环境说明
+- [x] **P051** `docs/results/v0.1.0/`：summary、raw traces、复现命令、环境说明（已脱敏）
 - [x] **P052** 中英 README：why、quickstart、matrix、limitations、non-goals、non-official 声明
 - [ ] **P053** npm 包（P0）+ Docker 镜像（P1）
 - [ ] **P054** 90 秒演示视频/GIF：一条命令跑出矩阵 + 一个失败场景
-- [ ] **P055** 首篇中文对比文章 + 英文 post
+- [x] **P055** 首篇中文文章 + 英文 post（`docs/articles/2026-11-12-*`）
 - [ ] **P056** GitHub Release v0.1.0
 - [ ] **P057** `FAIRNESS.md`：公平性、被测方回应窗口、负责任披露、署名
 

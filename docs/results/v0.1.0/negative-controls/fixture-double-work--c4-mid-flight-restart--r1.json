@@ -1,0 +1,52 @@
+{
+  "scenario": "c4-mid-flight-restart",
+  "subject": "fixture-double-work",
+  "repeat": 1,
+  "events": [
+    {
+      "id": "evt-c4-001",
+      "kind": "issue_comment",
+      "source": "github",
+      "threadKey": "acme/checkout#12",
+      "actor": "alice",
+      "text": "@superagent-bot please fix the login timeout on checkout",
+      "mentionsAgent": true,
+      "timestamp": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "outbound": [
+    {
+      "id": "negative-out-1",
+      "threadKey": "acme/checkout#12",
+      "body": "negative ack 1",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "metadata": {
+        "fault": "double-work"
+      }
+    }
+  ],
+  "snapshot": {
+    "tickets": 1,
+    "openTickets": 1,
+    "endedTickets": 0,
+    "outbound": 1
+  },
+  "modelCalls": [],
+  "adapterLogs": [
+    "negative fixture fault=double-work"
+  ],
+  "checks": [
+    {
+      "id": "capability:work-active",
+      "label": "capability work-active",
+      "status": "not_tested",
+      "expected": true,
+      "actual": false,
+      "detail": "fixture-double-work does not declare this capability"
+    }
+  ],
+  "status": "not_tested",
+  "durationMs": 9,
+  "restartMode": "mid-flight",
+  "midFlightObserved": false
+}

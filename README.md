@@ -13,7 +13,11 @@ reports what it could observe — and what it could not.
 **Status: MVP (2026-11).** Six core scenarios, two subjects, a fixture that
 validates the evaluator, and negative controls that prove it can fail. This is a
 behavioral matrix, not a leaderboard.
-[中文说明](README.zh-CN.md) · [Benchmark spec](docs/SPEC.md)
+[中文说明](README.zh-CN.md) · [Benchmark spec](docs/SPEC.md) ·
+[Pinned v0.1.0 results](docs/results/v0.1.0/) ·
+[English article](docs/articles/2026-11-12-proactive-agent-benchmark.md) ·
+[中文文章](docs/articles/2026-11-12-proactive-agent-benchmark.zh-CN.md) ·
+[Release](https://github.com/Mikkey-f/deepseek-superagent-bench/releases/tag/v0.1.0)
 
 ## Why
 
