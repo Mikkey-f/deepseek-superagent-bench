@@ -40,6 +40,20 @@ C2, C5, and C7 require a ticket count; an adapter without `ticket-count`
 reports those scenarios `not_tested`. The `fixture` subject exists only to
 validate the evaluator. It is not a product or a benchmark subject.
 
+### Evaluator self-test
+
+`npm test` and `npm run bench:selftest` include three deliberately broken
+fixture-mode adapters:
+
+| Negative control | Intended failure |
+|---|---|
+| `fixture-double-work` | C2 creates two tickets for one event; the ticket assertion must fail. |
+| `fixture-replay-restart` | C7 replays an outbound after restart; the duplicate assertion must fail. |
+| `fixture-unauthorized-work` | C5 acts on an unauthorized sender; ticket and authorization assertions must fail. |
+
+They exist only to prove the evaluator can fail. They are not subjects and are
+excluded from the reference matrix.
+
 ## Quickstart
 
 Requirements: Node.js 22+ and npm. The default suites need no API keys and no

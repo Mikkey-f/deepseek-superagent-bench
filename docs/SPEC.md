@@ -187,6 +187,20 @@ The CLI repeats each scenario three times by default. The scenario result is:
 A flaky result is not averaged away or hidden. Repeats exist to expose
 nondeterminism in the subject or the adapter.
 
+### 7.1 Negative controls
+
+The evaluator ships with three fixture-mode negative controls. They are
+intentionally broken and exist only to prove the evaluator can fail:
+
+| Adapter | Injected fault | Required failure |
+|---|---|---|
+| `fixture-double-work` | Processes duplicate event ids and creates two tickets. | C2 `tickets-created` fails. |
+| `fixture-replay-restart` | Replays an outbound message after restart. | C7 `no-duplicate-outbound` fails. |
+| `fixture-unauthorized-work` | Ignores the allowlist and acts for an unauthorized sender. | C5 `tickets-created` and `unauthorized-work` fail. |
+
+`npm test` and `npm run bench:selftest` assert these outcomes in CI. Negative
+controls are not subjects and never appear in the reference matrix.
+
 ## 8. Report and fairness
 
 Every report includes:

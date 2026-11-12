@@ -22,9 +22,10 @@ behavioral benchmark). Continue from `STATUS.md`.
 ## Scope
 
 **Current MVP (2026-11):** 4 core scenarios × 2 stable subjects (opensuperagent,
-LofiSu) plus a fixture that validates the evaluator. Deterministic mock model and
-source; JSON/Markdown report with raw traces; bilingual README; offline fixture
-CI; npm tooling. Ship this before expanding.
+LofiSu) plus a fixture and three negative-control fixtures that prove the
+evaluator can fail. Deterministic mock model and source; JSON/Markdown report
+with raw traces; bilingual README; offline fixture CI; npm tooling. Ship this
+before expanding.
 
 **Post-MVP v0.1:** grow to 7 core scenarios, add an experimental adapter for the
 official prototype, and consider an HTML report. New scenarios go to the v0.2
@@ -77,7 +78,8 @@ Use npm (pnpm global install was declined). Keep these in sync with
 npm ci                     # CI / clean install
 npm run typecheck
 npm run lint
-npm test                   # unit + fixture determinism tests
+npm test                   # unit + fixture determinism + negative-control tests
+npm run bench:selftest     # explicit evaluator negative-control test
 npm run build
 npm run bench:fixture      # offline fixture suite, no subject repos
 npm run prepare:subjects   # copy sibling subject repos into results/subjects
